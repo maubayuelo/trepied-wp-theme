@@ -1,0 +1,127 @@
+/* Custom CSS for Trépied website */
+
+/* Base typography and colors fallback (match html-version) */
+body {
+    min-height: 100vh;
+    background-color: #f5f3ed;
+    color: #1a1a1a;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+.font-condensed {
+    font-family: 'Barlow Condensed', sans-serif;
+}
+
+/* Fallback for Tailwind custom color hover utilities */
+.hover\:bg-accent-red:hover {
+    background-color: #ff0000 !important;
+}
+
+.hover\:text-accent-red:hover {
+    color: #ff0000 !important;
+}
+
+.hover\:border-accent-red:hover {
+    border-color: #ff0000 !important;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f5f3ed;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #1a1a1a;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #000;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Mobile menu animation */
+#mobile-menu.active {
+    transform: translateX(0);
+}
+
+/* Testimonial slider fade effect */
+.testimonial-item {
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    display: none;
+}
+
+.testimonial-item.active {
+    opacity: 1;
+    display: block;
+}
+
+/* Testimonial dots */
+.testimonial-dot {
+    transition: all 0.3s ease;
+}
+
+.testimonial-dot.active {
+    background-color: #1a1a1a;
+}
+
+/* Project modal animation */
+#project-modal {
+    transition: opacity 0.3s ease;
+}
+
+#project-modal.show {
+    opacity: 1;
+}
+
+/* Hover effects for images */
+img {
+    transition: transform 0.3s ease;
+}
+
+/* Touch-friendly mobile menu */
+@media (max-width: 768px) {
+    .mobile-menu-link {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* YouTube iframe styling */
+iframe {
+    border: none;
+}
+
+/* Accessibility focus styles */
+a:focus,
+button:focus {
+    outline: 2px solid #ff0000;
+    outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+    nav,
+    footer,
+    #mobile-menu,
+    #project-modal {
+        display: none;
+    }
+}

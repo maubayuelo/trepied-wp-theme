@@ -1,63 +1,5 @@
 // Main JavaScript for Trépied website
 
-const contentData = {
-    projects: [
-        {
-            id: 1,
-            title: 'Campagne de recrutement',
-            client: 'PME locale — Montréal',
-            shortDescription: "Attirer de nouveaux talents en montrant le quotidien réel de l'équipe. Production, réalisation et montage.",
-            description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.',
-            image: 'https://images.unsplash.com/photo-1744339699989-550c61f3ecb8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxNb250cmVhbCUyMHVyYmFuJTIwY3JlYXRpdmV8ZW58MXx8fHwxNzcwNTMzNzcxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-            videoUrl: 'https://www.youtube.com/embed/kcfs1-ryKWE'
-        },
-        {
-            id: 2,
-            title: 'Série de clips musicaux',
-            client: 'Artiste indépendant',
-            shortDescription: "Créer un univers visuel cohérent et sensible, fidèle à l'identité artistique.",
-            description: 'Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-            image: 'https://images.unsplash.com/photo-1582474277699-0deef526f592?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxNb250cmVhbCUyMGNpdHlzY2FwZSUyMGFyY2hpdGVjdHVyZXxlbnwxfHx8fDE3NzA1MzM3NzJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral',
-            videoUrl: 'https://www.youtube.com/embed/kcfs1-ryKWE'
-        },
-        {
-            id: 3,
-            title: 'Documentaire court',
-            client: 'Organisme culturel',
-            shortDescription: 'Mettre en lumière un projet à impact social, avec un regard humain et accessible.',
-            description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo.',
-            image: `https://images.unsplash.com/photo-1654000680055-a6c0dbe25c7b?q=80&w=2069&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D`,
-            videoUrl: 'https://www.youtube.com/embed/kcfs1-ryKWE'
-        }
-    ],
-    testimonials: [
-        {
-            id: 1,
-            quote: "Trépied a transformé notre message confus en une vidéo claire et percutante. L'équipe nous a écoutés vraiment.",
-            name: 'Marie Gagnon',
-            role: 'Directrice, PME Montréal'
-        },
-        {
-            id: 2,
-            quote: "Une collaboration fluide et humaine. Ils ont capté l'essence de notre projet culturel avec une sensibilité rare.",
-            name: 'David Lemieux',
-            role: 'Producteur, Festival de musique'
-        },
-        {
-            id: 3,
-            quote: "Professionnels, créatifs et à l'écoute. Le résultat a dépassé nos attentes et notre vidéo fait maintenant partie intégrante de notre stratégie.",
-            name: 'Sophie Tremblay',
-            role: 'Directrice marketing, Organisme culturel'
-        },
-        {
-            id: 4,
-            quote: 'Trépied comprend rapidement les enjeux et propose des solutions adaptées. Un vrai partenaire de confiance pour nos contenus vidéo.',
-            name: 'Jean-François Roy',
-            role: 'Fondateur, Startup tech Montréal'
-        }
-    ]
-};
-
 const recreateIcons = () => {
     if (window.lucide && typeof window.lucide.createIcons === 'function') {
         window.lucide.createIcons();
@@ -95,66 +37,35 @@ mobileMenuLinks.forEach((link) => {
     });
 });
 
-let currentProjects = contentData.projects;
-
-function renderProjects() {
-    const container = document.getElementById('projects-container');
-    if (!container) {
-        return;
-    }
-
-    container.innerHTML = currentProjects.map((project) => `
-        <div>
-            <img src="${project.image}" alt="" class="w-full h-[360px] md:h-[520px] object-cover rounded-2xl mb-8">
-            <div class="max-w-[680px]">
-                <h3 class="text-[24px] md:text-[28px] leading-[1.3] font-medium mb-3">
-                    ${project.title}
-                </h3>
-                <p class="text-[16px] md:text-[17px] font-medium mb-2 text-[#1a1a1a]">
-                    ${project.client}
-                </p>
-                <p class="text-[17px] md:text-[18px] leading-[1.6] text-[#4a4a4a] mb-6">
-                    ${project.shortDescription}
-                </p>
-                <a href="#" onclick="openProjectModal(${project.id}); return false;" class="inline-block text-[15px] text-[#1a1a1a] hover:text-[#ff0000] transition-all underline underline-offset-4 font-bold">
-                    Voir projet →
-                </a>
-            </div>
-        </div>
-    `).join('');
-}
-
-function openProjectModal(projectId) {
-    const project = currentProjects.find((item) => item.id === projectId);
-    if (!project) {
-        return;
-    }
-
+// Project modal: reads data from DOM attributes
+function openProjectModal(projectCard) {
     const modal = document.getElementById('project-modal');
     const modalContent = document.getElementById('modal-content');
 
-    if (!modal || !modalContent) {
+    if (!modal || !modalContent || !projectCard) {
         return;
     }
 
+    const title = projectCard.dataset.projectTitle || '';
+    const client = projectCard.dataset.projectClient || '';
+    const videoId = projectCard.dataset.projectVideo || '';
+    const longDescriptionTemplate = projectCard.querySelector('.project-long-description');
+    const longDescription = longDescriptionTemplate ? longDescriptionTemplate.innerHTML : '';
+
+    const videoUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+
     modalContent.innerHTML = `
-        
         <div class="p-6 md:p-6">
-
-        <div class="relative w-full aspect-video rounded-2xl overflow-hidden">
-            <iframe src="${project.videoUrl}" title="${project.title}" class="absolute inset-0 w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-
-
+            ${videoUrl ? `
+            <div class="relative w-full aspect-video rounded-2xl overflow-hidden">
+                <iframe src="${videoUrl}" title="${title}" class="absolute inset-0 w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            ` : ''}
             <h3 class="text-[28px] md:text-[30px] leading-[1.2] font-bold mb-3 mt-4 text-black font-condensed">
-                ${project.title}
+                ${title}
             </h3>
-            <p class="text-[17px] md:text-[17px] font-bold mb-3 text-[#1a1a1a]">
-                ${project.client}
-            </p>
-            <p class="text-[16px] md:text-[17px] leading-[1.7] text-[#4a4a4a]">
-                ${project.description}
-            </p>
+            ${client ? `<p class="text-[17px] md:text-[17px] font-bold mb-3 text-[#1a1a1a]">${client}</p>` : ''}
+            ${longDescription ? `<div class="text-[16px] md:text-[17px] leading-[1.7] text-[#4a4a4a]">${longDescription}</div>` : ''}
         </div>
     `;
 
@@ -165,6 +76,17 @@ function openProjectModal(projectId) {
 
     recreateIcons();
 }
+
+// Set up project modal triggers
+document.querySelectorAll('.project-modal-trigger').forEach((trigger) => {
+    trigger.addEventListener('click', (event) => {
+        event.preventDefault();
+        const projectCard = trigger.closest('.project-card');
+        if (projectCard) {
+            openProjectModal(projectCard);
+        }
+    });
+});
 
 function closeProjectModal() {
     const modal = document.getElementById('project-modal');
@@ -195,43 +117,73 @@ if (projectModal) {
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         closeProjectModal();
+        closeQuoteModal();
     }
 });
 
-let currentTestimonials = contentData.testimonials;
+// Quote Modal Functions
+function openQuoteModal() {
+    const modal = document.getElementById('quote-modal');
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+
+    // Close mobile menu if open
+    if (mobileMenu && mobileMenu.classList.contains('active')) {
+        mobileMenu.classList.remove('active');
+        if (mobileMenuToggle) {
+            const icon = mobileMenuToggle.querySelector('[data-lucide]');
+            if (icon) {
+                icon.setAttribute('data-lucide', 'menu');
+            }
+        }
+    }
+
+    recreateIcons();
+}
+
+function closeQuoteModal() {
+    const modal = document.getElementById('quote-modal');
+    if (!modal) {
+        return;
+    }
+
+    modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+}
+
+// Quote modal triggers
+document.querySelectorAll('.quote-modal-trigger').forEach((trigger) => {
+    trigger.addEventListener('click', (event) => {
+        event.preventDefault();
+        openQuoteModal();
+    });
+});
+
+// Quote modal close button
+const quoteModalCloseBtn = document.getElementById('quote-modal-close');
+if (quoteModalCloseBtn) {
+    quoteModalCloseBtn.addEventListener('click', closeQuoteModal);
+}
+
+// Quote modal backdrop click
+const quoteModal = document.getElementById('quote-modal');
+if (quoteModal) {
+    quoteModal.addEventListener('click', (event) => {
+        if (event.target === quoteModal) {
+            closeQuoteModal();
+        }
+    });
+}
+
 let currentTestimonialIndex = 0;
 let touchStartX = 0;
 let touchEndX = 0;
-
-function renderTestimonials() {
-    const slider = document.getElementById('testimonial-slider');
-    if (!slider) {
-        return;
-    }
-
-    slider.innerHTML = currentTestimonials.map((testimonial, index) => `
-        <div class="testimonial-item ${index === 0 ? 'active' : ''}" data-index="${index}">
-            <p class="text-[24px] md:text-[28px] lg:text-[32px] leading-[1.4] font-medium mb-12 text-[#1a1a1a]">
-                ${testimonial.quote}
-            </p>
-            <div class="text-[16px] md:text-[17px]">
-                <p class="font-medium text-[#1a1a1a]">${testimonial.name}</p>
-                <p class="text-[#6a6a6a]">${testimonial.role}</p>
-            </div>
-        </div>
-    `).join('');
-}
-
-function createTestimonialDots() {
-    const dotsContainer = document.getElementById('testimonial-dots');
-    if (!dotsContainer) {
-        return;
-    }
-
-    dotsContainer.innerHTML = currentTestimonials.map((_, index) => `
-        <button onclick="goToTestimonial(${index})" class="testimonial-dot w-3 h-3 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${index === 0 ? 'active bg-[#1a1a1a]' : 'bg-[#d0d0d0]'}" aria-label="Testimonial ${index + 1}"></button>
-    `).join('');
-}
 
 function showTestimonial(index) {
     const testimonials = document.querySelectorAll('.testimonial-item');
@@ -263,12 +215,16 @@ function goToTestimonial(index) {
 }
 
 function nextTestimonial() {
-    const nextIndex = (currentTestimonialIndex + 1) % currentTestimonials.length;
+    const testimonials = document.querySelectorAll('.testimonial-item');
+    if (testimonials.length === 0) return;
+    const nextIndex = (currentTestimonialIndex + 1) % testimonials.length;
     showTestimonial(nextIndex);
 }
 
 function previousTestimonial() {
-    const prevIndex = currentTestimonialIndex === 0 ? currentTestimonials.length - 1 : currentTestimonialIndex - 1;
+    const testimonials = document.querySelectorAll('.testimonial-item');
+    if (testimonials.length === 0) return;
+    const prevIndex = currentTestimonialIndex === 0 ? testimonials.length - 1 : currentTestimonialIndex - 1;
     showTestimonial(prevIndex);
 }
 
@@ -327,11 +283,203 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderProjects();
-    renderTestimonials();
-    createTestimonialDots();
+    // Set up testimonial dot click handlers
+    document.querySelectorAll('.testimonial-dot').forEach((dot) => {
+        dot.addEventListener('click', () => {
+            const index = parseInt(dot.dataset.index, 10);
+            if (!isNaN(index)) {
+                goToTestimonial(index);
+            }
+        });
+    });
     recreateIcons();
+    
+    // Initialize quote request form handler
+    initQuoteForm();
+    
+    // Initialize Go to Top button
+    initGoToTop();
 });
 
-window.openProjectModal = openProjectModal;
-window.goToTestimonial = goToTestimonial;
+// Quote Request Form Handler
+function initQuoteForm() {
+    const form = document.getElementById('quote-request-form');
+    if (!form) {
+        return;
+    }
+
+    const messagesContainer = document.getElementById('quote-form-messages');
+    const messageContent = messagesContainer?.querySelector('[data-message-content]');
+    const submitBtn = form.querySelector('[data-form-submit-btn]');
+    const btnText = submitBtn?.querySelector('[data-btn-text]');
+    const btnLoading = submitBtn?.querySelector('[data-btn-loading]');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        // Check if trepiedForms is available
+        if (typeof window.trepiedForms === 'undefined') {
+            console.error('Form configuration not loaded');
+            return;
+        }
+
+        // Clear previous messages
+        hideFormMessage();
+        clearFieldErrors();
+
+        // Disable submit button and show loading state
+        setFormLoading(true);
+
+        // Collect form data
+        const formData = new FormData(form);
+        formData.append('action', 'trepied_quote_request');
+        formData.append('nonce', window.trepiedForms.nonce);
+        formData.append('page_url', window.location.href);
+
+        try {
+            const response = await fetch(window.trepiedForms.ajaxUrl, {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin',
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                showFormMessage(result.data.message, 'success');
+                form.reset();
+                
+                // Track successful submission (for analytics)
+                if (typeof window.dataLayer !== 'undefined') {
+                    window.dataLayer.push({
+                        event: 'quote_form_submit',
+                        form_name: 'quote_request',
+                    });
+                }
+            } else {
+                const errorMessage = result.data?.message || window.trepiedForms.i18n.error;
+                showFormMessage(errorMessage, 'error');
+                
+                // Show field-specific errors if available
+                if (result.data?.errors) {
+                    showFieldErrors(result.data.errors);
+                }
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            showFormMessage(window.trepiedForms.i18n.error, 'error');
+        } finally {
+            setFormLoading(false);
+        }
+    });
+
+    function setFormLoading(isLoading) {
+        if (submitBtn) {
+            submitBtn.disabled = isLoading;
+        }
+        if (btnText) {
+            btnText.classList.toggle('hidden', isLoading);
+        }
+        if (btnLoading) {
+            btnLoading.classList.toggle('hidden', !isLoading);
+        }
+    }
+
+    function showFormMessage(message, type) {
+        if (!messagesContainer || !messageContent) {
+            return;
+        }
+
+        messageContent.textContent = message;
+        messageContent.className = 'p-4 rounded-lg text-[15px]';
+        
+        if (type === 'success') {
+            messageContent.classList.add('bg-green-100', 'text-green-800', 'border', 'border-green-200');
+        } else {
+            messageContent.classList.add('bg-red-100', 'text-red-800', 'border', 'border-red-200');
+        }
+
+        messagesContainer.classList.remove('hidden');
+        
+        // Scroll to message
+        messagesContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function hideFormMessage() {
+        if (messagesContainer) {
+            messagesContainer.classList.add('hidden');
+        }
+    }
+
+    function showFieldErrors(errors) {
+        Object.entries(errors).forEach(([fieldName, errorMessage]) => {
+            const field = form.querySelector(`[data-field="${fieldName}"]`);
+            if (field) {
+                field.classList.add('border-red-500');
+                
+                // Add error message below field
+                const errorEl = document.createElement('p');
+                errorEl.className = 'text-red-600 text-[13px] mt-1';
+                errorEl.setAttribute('data-field-error', fieldName);
+                errorEl.textContent = errorMessage;
+                field.parentNode.appendChild(errorEl);
+            }
+        });
+    }
+
+    function clearFieldErrors() {
+        // Remove error styling from fields
+        form.querySelectorAll('.border-red-500').forEach((field) => {
+            field.classList.remove('border-red-500');
+        });
+        
+        // Remove error messages
+        form.querySelectorAll('[data-field-error]').forEach((errorEl) => {
+            errorEl.remove();
+        });
+    }
+}
+
+// Go to Top Button Handler
+function initGoToTop() {
+    const goToTopBtn = document.getElementById('go-to-top');
+    if (!goToTopBtn) {
+        return;
+    }
+
+    const scrollThreshold = 400;
+
+    // Show/hide button based on scroll position
+    function toggleGoToTopButton() {
+        if (window.scrollY > scrollThreshold) {
+            goToTopBtn.classList.remove('opacity-0', 'invisible', 'translate-y-4');
+            goToTopBtn.classList.add('opacity-100', 'visible', 'translate-y-0');
+        } else {
+            goToTopBtn.classList.add('opacity-0', 'invisible', 'translate-y-4');
+            goToTopBtn.classList.remove('opacity-100', 'visible', 'translate-y-0');
+        }
+    }
+
+    // Scroll to top on click
+    goToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // Listen to scroll events with throttling
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                toggleGoToTopButton();
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Initial check
+    toggleGoToTopButton();
+}

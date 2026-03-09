@@ -3,11 +3,39 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+/**
+ * Include ACF helper functions
+ */
+require_once get_template_directory() . '/inc/acf.php';
+
+/**
+ * Include ACF field group registration
+ * (File is protected internally - only registers if ACF is active)
+ */
+require_once get_template_directory() . '/inc/acf-fields.php';
+
+/**
+ * Include Calendly integration
+ */
+require_once get_template_directory() . '/inc/calendly.php';
+
+/**
+ * Include Quote Request form handler
+ */
+require_once get_template_directory() . '/inc/forms.php';
+
 function trepied_theme_setup(): void
 {
+	// Load text domain for translations
+	load_theme_textdomain('trepied', get_template_directory() . '/languages');
+	
 	add_theme_support('title-tag');
 	add_theme_support('post-thumbnails');
 	add_theme_support('html5', ['search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script']);
+	
+	// Custom image sizes for optimized loading
+	add_image_size('trepied-service', 1080, 720, true);  // Service section images
+	add_image_size('trepied-hero', 1400, 800, true);     // Hero section images
 }
 add_action('after_setup_theme', 'trepied_theme_setup');
 
@@ -15,6 +43,7 @@ function trepied_enqueue_assets(): void
 {
 	$theme_version = wp_get_theme()->get('Version');
 
+	// Google Fonts - with display=swap for better performance
 	wp_enqueue_style(
 		'trepied-google-fonts',
 		'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Inter:wght@400;500;600;700;900&display=swap',
@@ -22,6 +51,7 @@ function trepied_enqueue_assets(): void
 		null
 	);
 
+	// Main theme stylesheet
 	wp_enqueue_style(
 		'trepied-theme-style',
 		get_stylesheet_uri(),
@@ -29,6 +59,7 @@ function trepied_enqueue_assets(): void
 		$theme_version
 	);
 
+	// Custom styles with file-based versioning for cache busting
 	$custom_css_path = get_template_directory() . '/assets/css/styles.css';
 	wp_enqueue_style(
 		'trepied-styles',
@@ -37,6 +68,7 @@ function trepied_enqueue_assets(): void
 		file_exists($custom_css_path) ? (string) filemtime($custom_css_path) : $theme_version
 	);
 
+	// Tailwind CDN - load in head (required for styling)
 	wp_register_script('trepied-tailwind', 'https://cdn.tailwindcss.com', [], null, false);
 	wp_add_inline_script(
 		'trepied-tailwind',
@@ -45,8 +77,10 @@ function trepied_enqueue_assets(): void
 	);
 	wp_enqueue_script('trepied-tailwind');
 
-	wp_enqueue_script('trepied-lucide', 'https://unpkg.com/lucide@latest', [], null, true);
+	// Lucide icons - load in footer, defer
+	wp_enqueue_script('trepied-lucide', 'https://unpkg.com/lucide@latest/dist/umd/lucide.min.js', [], null, true);
 
+	// Main JS - load in footer with file-based versioning
 	$main_js_path = get_template_directory() . '/assets/js/main.js';
 	wp_enqueue_script(
 		'trepied-main',
@@ -61,6 +95,56 @@ function trepied_enqueue_assets(): void
 	]);
 }
 add_action('wp_enqueue_scripts', 'trepied_enqueue_assets');
+
+/**
+ * Add preconnect hints for external resources
+ * Improves load time by establishing early connections
+ */
+function trepied_add_resource_hints(): void {
+	// Preconnect to Google Fonts (critical)
+	echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
+	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+	
+	// Preconnect to CDNs used by the theme
+	echo '<link rel="preconnect" href="https://unpkg.com" crossorigin>' . "\n";
+	echo '<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>' . "\n";
+	
+	// DNS prefetch for Calendly (loaded on interaction)
+	echo '<link rel="dns-prefetch" href="https://assets.calendly.com">' . "\n";
+	
+	// DNS prefetch for YouTube (if videos are used)
+	echo '<link rel="dns-prefetch" href="https://www.youtube-nocookie.com">' . "\n";
+	echo '<link rel="dns-prefetch" href="https://i.ytimg.com">' . "\n";
+}
+add_action('wp_head', 'trepied_add_resource_hints', 1);
+
+/**
+ * Add defer attribute to non-critical scripts
+ */
+function trepied_defer_scripts(string $tag, string $handle, string $src): string {
+	// Scripts that should be deferred
+	$defer_scripts = ['trepied-lucide', 'trepied-main'];
+	
+	if (in_array($handle, $defer_scripts, true)) {
+		return str_replace(' src', ' defer src', $tag);
+	}
+	
+	return $tag;
+}
+add_filter('script_loader_tag', 'trepied_defer_scripts', 10, 3);
+
+/**
+ * Add fetchpriority hint for critical CSS
+ */
+function trepied_optimize_stylesheets(string $tag, string $handle, string $href, string $media): string {
+	// Google Fonts should load with high priority
+	if ($handle === 'trepied-google-fonts') {
+		return str_replace("rel='stylesheet'", "rel='stylesheet' fetchpriority='high'", $tag);
+	}
+	
+	return $tag;
+}
+add_filter('style_loader_tag', 'trepied_optimize_stylesheets', 10, 4);
 
 /**
  * Disable Polylang's default language switcher in footer
@@ -85,17 +169,70 @@ add_action('wp_footer', function () {
 }, 1);
 
 /**
+ * Disable WPML's default language switcher
+ * The theme's nav already has custom language switchers
+ */
+function trepied_disable_wpml_language_switcher(): void
+{
+	// Disable WPML's floating language switcher
+	add_filter('wpml_ls_enable', '__return_false');
+	
+	// Remove WPML language switcher from wp_nav_menu
+	add_filter('wp_nav_menu_items', function($items, $args) {
+		// Remove any WPML-inserted language switcher from menus
+		$items = preg_replace('/<li[^>]*class="[^"]*wpml-ls-item[^"]*"[^>]*>.*?<\/li>/is', '', $items);
+		return $items;
+	}, 100, 2);
+}
+add_action('init', 'trepied_disable_wpml_language_switcher');
+
+// Hide any remaining WPML language switcher elements via CSS
+add_action('wp_footer', function () {
+	echo '<style>.wpml-ls-statics-footer, .wpml-ls-statics-post_translations, .wpml-ls-legacy-dropdown, .wpml-ls-legacy-list-horizontal, .wpml-ls-legacy-list-vertical, .wpml-ls-sidebars-wpml-ls-widget, #lang_sel, #lang_sel_click, #lang_sel_list, .icl_lang_sel_widget, .widget_icl_lang_sel_widget { display: none !important; }</style>';
+}, 1);
+
+/**
  * Get language switcher HTML for use in templates
- * Uses Polylang if available, falls back to static links
+ * Supports WPML, Polylang, or hides gracefully if neither is active
  *
  * @param string $separator The separator between language links
- * @return string HTML output
+ * @return string HTML output (empty if no multilingual plugin active)
  */
 function trepied_language_switcher(string $separator = ' / '): string
 {
 	$output = '';
+	$links = [];
+	$separator_html = '<span class="text-[#d0d0d0]">' . esc_html($separator) . '</span>';
 
-	if (function_exists('pll_the_languages')) {
+	// Try WPML first
+	if (function_exists('icl_get_languages')) {
+		$languages = icl_get_languages('skip_missing=0&orderby=code');
+		
+		if (!empty($languages)) {
+			foreach ($languages as $lang) {
+				if ($lang['active']) {
+					// Active language: render as span (not clickable)
+					$links[] = sprintf(
+						'<span class="font-medium underline underline-offset-4" lang="%s">%s</span>',
+						esc_attr($lang['language_code']),
+						esc_html(strtoupper($lang['language_code']))
+					);
+				} else {
+					// Other languages: render as link
+					$links[] = sprintf(
+						'<a href="%s" class="hover:opacity-60 transition-opacity" lang="%s" hreflang="%s">%s</a>',
+						esc_url($lang['url']),
+						esc_attr($lang['language_code']),
+						esc_attr($lang['language_code']),
+						esc_html(strtoupper($lang['language_code']))
+					);
+				}
+			}
+			$output = implode($separator_html, $links);
+		}
+	}
+	// Fallback to Polylang
+	elseif (function_exists('pll_the_languages')) {
 		$languages = pll_the_languages([
 			'raw'              => 1,
 			'hide_if_empty'    => 0,
@@ -105,31 +242,36 @@ function trepied_language_switcher(string $separator = ' / '): string
 		]);
 
 		if (!empty($languages)) {
-			$links = [];
 			foreach ($languages as $lang) {
-				$class = $lang['current_lang'] ? 'font-medium' : '';
-				$links[] = sprintf(
-					'<a href="%s" class="%s hover:opacity-60 transition-opacity" lang="%s" hreflang="%s">%s</a>',
-					esc_url($lang['url']),
-					esc_attr($class),
-					esc_attr($lang['slug']),
-					esc_attr($lang['slug']),
-					esc_html(strtoupper($lang['slug']))
-				);
+				if ($lang['current_lang']) {
+					// Active language: render as span (not clickable)
+					$links[] = sprintf(
+						'<span class="font-medium underline underline-offset-4" lang="%s">%s</span>',
+						esc_attr($lang['slug']),
+						esc_html(strtoupper($lang['slug']))
+					);
+				} else {
+					// Other languages: render as link
+					$links[] = sprintf(
+						'<a href="%s" class="hover:opacity-60 transition-opacity" lang="%s" hreflang="%s">%s</a>',
+						esc_url($lang['url']),
+						esc_attr($lang['slug']),
+						esc_attr($lang['slug']),
+						esc_html(strtoupper($lang['slug']))
+					);
+				}
 			}
-			$separator_html = '<span class="text-[#d0d0d0]">' . esc_html($separator) . '</span>';
 			$output = implode($separator_html, $links);
 		}
 	}
 
-	// Fallback to static links if Polylang not active or no languages
-	if (empty($output)) {
-		$output = '<a href="#" class="font-medium hover:opacity-60 transition-opacity">FR</a>';
-		$output .= '<span class="text-[#d0d0d0]">/</span>';
-		$output .= '<a href="#" class="hover:opacity-60 transition-opacity">EN</a>';
-		$output .= '<span class="text-[#d0d0d0]">/</span>';
-		$output .= '<a href="#" class="hover:opacity-60 transition-opacity">ES</a>';
-	}
-
+	// No fallback - hide gracefully if no multilingual plugin is active
 	return $output;
+}
+
+/**
+ * Check if any multilingual plugin is active
+ */
+function trepied_is_multilingual_active(): bool {
+	return function_exists('icl_get_languages') || function_exists('pll_the_languages');
 }

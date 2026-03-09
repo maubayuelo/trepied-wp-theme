@@ -125,3 +125,34 @@ button:focus {
         display: none;
     }
 }
+
+/* Calendly popup fixes - prevent loading animation glitch */
+.calendly-overlay {
+    transition: none !important;
+}
+
+.calendly-overlay * {
+    transition: none !important;
+    animation-timing-function: linear !important;
+}
+
+.calendly-overlay img,
+.calendly-popup img,
+.calendly-popup-content img {
+    transition: none !important;
+    transform: none !important;
+}
+
+.calendly-spinner {
+    transition: none !important;
+}
+
+/* Ensure Calendly popup appears above everything */
+.calendly-overlay {
+    z-index: 9999 !important;
+}
+
+/* Fix potential backdrop filter conflicts */
+.calendly-popup-close {
+    transition: none !important;
+}

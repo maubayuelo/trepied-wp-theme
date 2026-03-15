@@ -119,6 +119,42 @@ function trepied_add_resource_hints(): void {
 add_action('wp_head', 'trepied_add_resource_hints', 1);
 
 /**
+ * Add meta description for SEO
+ * Only outputs if no SEO plugin (Yoast, RankMath, etc.) is active
+ */
+function trepied_add_meta_description(): void {
+	// Skip if SEO plugin is handling meta descriptions
+	if (defined('WPSEO_VERSION') || defined('RANK_MATH_VERSION') || defined('AIOSEO_VERSION')) {
+		return;
+	}
+
+	$description = '';
+
+	if (is_front_page() || is_home()) {
+		$description = get_bloginfo('description');
+		if (empty($description)) {
+			$description = __('Trépied - Creative studio specializing in web development, branding, and digital experiences.', 'trepied');
+		}
+	} elseif (is_singular()) {
+		$post = get_queried_object();
+		if ($post && !empty($post->post_excerpt)) {
+			$description = $post->post_excerpt;
+		} elseif ($post && !empty($post->post_content)) {
+			$description = wp_trim_words(strip_shortcodes($post->post_content), 25, '...');
+		}
+	} elseif (is_category() || is_tag() || is_tax()) {
+		$description = term_description();
+	}
+
+	if (!empty($description)) {
+		$description = wp_strip_all_tags($description);
+		$description = esc_attr(substr($description, 0, 160));
+		echo '<meta name="description" content="' . $description . '">' . "\n";
+	}
+}
+add_action('wp_head', 'trepied_add_meta_description', 1);
+
+/**
  * Add defer attribute to non-critical scripts
  */
 function trepied_defer_scripts(string $tag, string $handle, string $src): string {

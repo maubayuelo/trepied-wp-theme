@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
  * Define TREPIED_CALENDLY_URL in wp-config.php to customize
  */
 if (!defined('TREPIED_CALENDLY_URL')) {
-	define('TREPIED_CALENDLY_URL', 'https://calendly.com/mauricio-bayuelo/30min');
+	define('TREPIED_CALENDLY_URL', 'https://calendly.com/maubayuelo/30min');
 }
 
 /**

@@ -19,9 +19,11 @@ define('TREPIED_CONSENT_VERSION', 1);
 /**
  * Resolve the Privacy Policy URL for the current language.
  *
- * Minimal version for Fase 3 — looks up the English-default page by path.
- * Fase 5 replaces this with a WPML-aware resolver (fallback to default
- * language when the current-language translation doesn't exist).
+ * The English page (site default language) is the canonical anchor:
+ * looked up by its untranslated slug, then resolved to the active
+ * language's translation via WPML if one exists. Falls back to the
+ * English page itself when no translation exists for the current
+ * language, so the link never breaks.
  *
  * @return string
  */
@@ -33,7 +35,18 @@ function trepied_get_privacy_policy_url(): string
 		return '';
 	}
 
-	return (string) get_permalink($page);
+	$page_id = (int) $page->ID;
+
+	if (function_exists('icl_object_id')) {
+		$translated_id = icl_object_id($page_id, 'page', false);
+		if ($translated_id) {
+			$page_id = (int) $translated_id;
+		}
+	}
+
+	$url = get_permalink($page_id);
+
+	return $url ? (string) $url : '';
 }
 
 /**

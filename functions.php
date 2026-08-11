@@ -14,6 +14,11 @@ require_once get_template_directory() . '/inc/options.php';
 require_once get_template_directory() . '/inc/consent/consent.php';
 
 /**
+ * Include GA4 (Consent Mode v2) + Meta Pixel gating
+ */
+require_once get_template_directory() . '/inc/consent/analytics.php';
+
+/**
  * Include ACF helper functions
  */
 require_once get_template_directory() . '/inc/acf.php';

@@ -324,9 +324,16 @@
 
 	// ---- Init ----
 	function init() {
-		// Let any listener registered before this point (e.g. GA4/Pixel
-		// gating scripts) know the current state immediately on load.
-		dispatchConsent(currentState ? currentState.analytics : false, currentState ? currentState.marketing : false);
+		// Deferred to the next tick: scripts are enqueued in the footer,
+		// where DOMContentLoaded has usually already fired, so this code
+		// runs synchronously as the browser parses <script> tags. A gating
+		// script loaded right after this one (e.g. GA4/Pixel) wouldn't have
+		// attached its `magneto:consent` listener yet if we dispatched
+		// synchronously here — setTimeout(0) waits until all same-tick
+		// script tags have finished executing first.
+		setTimeout(function () {
+			dispatchConsent(currentState ? currentState.analytics : false, currentState ? currentState.marketing : false);
+		}, 0);
 
 		if (!currentState) {
 			showBanner();

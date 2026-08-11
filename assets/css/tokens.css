@@ -1,0 +1,19 @@
+/*
+ * Design tokens extracted from the theme's existing Tailwind config
+ * (functions.php) and hardcoded literals across templates. Introduced
+ * so new theme code (Loi 25 consent + legal pages) has a single source
+ * of truth instead of repeating hex literals.
+ */
+:root {
+	--trepied-color-bg: #f5f3ed;
+	--trepied-color-ink: #1a1a1a;
+	--trepied-color-accent: #ff0000;
+	--trepied-color-border: #b0b0b0;
+	--trepied-color-text-muted: #6a6a6a;
+	--trepied-color-text-secondary: #4a4a4a;
+	--trepied-color-white: #ffffff;
+	--trepied-color-black: #000000;
+
+	--trepied-font-sans: 'Inter', sans-serif;
+	--trepied-font-condensed: 'Barlow Condensed', sans-serif;
+}

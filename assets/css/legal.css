@@ -1,0 +1,127 @@
+/*
+ * Styles for page-legal.php (privacy policy / legal pages).
+ * Mobile-first: base = mobile, then 768px (tablet), 1024px (desktop).
+ */
+
+.legal {
+	max-width: 720px;
+	margin: 0 auto;
+	padding: 6rem 1.5rem 4rem;
+	color: var(--trepied-color-ink);
+	font-family: var(--trepied-font-sans);
+}
+
+.legal__title {
+	font-family: var(--trepied-font-condensed);
+	font-weight: 700;
+	font-size: 32px;
+	line-height: 1.15;
+	margin: 0 0 0.5rem;
+}
+
+.legal__updated {
+	font-size: 14px;
+	color: var(--trepied-color-text-muted);
+	margin: 0 0 2.5rem;
+}
+
+.legal__section {
+	margin: 0 0 2rem;
+}
+
+.legal__section-title {
+	font-family: var(--trepied-font-condensed);
+	font-weight: 700;
+	font-size: 22px;
+	line-height: 1.25;
+	margin: 0 0 0.75rem;
+}
+
+.legal__text {
+	font-size: 16px;
+	line-height: 1.7;
+	color: var(--trepied-color-text-secondary);
+	margin: 0 0 1rem;
+}
+
+.legal__text:last-child {
+	margin-bottom: 0;
+}
+
+.legal__list {
+	margin: 0 0 1rem;
+	padding-left: 1.25rem;
+	font-size: 16px;
+	line-height: 1.7;
+	color: var(--trepied-color-text-secondary);
+}
+
+.legal__list li {
+	margin-bottom: 0.5rem;
+}
+
+.legal a {
+	color: var(--trepied-color-ink);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.legal a:hover {
+	color: var(--trepied-color-accent);
+}
+
+/* Content pasted via the WP editor won't carry .legal__* classes —
+   style raw h2/p/ul so it still matches the legal__section look. */
+.legal__content h2 {
+	font-family: var(--trepied-font-condensed);
+	font-weight: 700;
+	font-size: 22px;
+	line-height: 1.25;
+	margin: 2rem 0 0.75rem;
+}
+
+.legal__content h2:first-child {
+	margin-top: 0;
+}
+
+.legal__content p,
+.legal__content ul,
+.legal__content ol {
+	font-size: 16px;
+	line-height: 1.7;
+	color: var(--trepied-color-text-secondary);
+	margin: 0 0 1rem;
+}
+
+.legal__content ul,
+.legal__content ol {
+	padding-left: 1.25rem;
+}
+
+.legal__content li {
+	margin-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+	.legal {
+		padding: 7rem 2rem 5rem;
+	}
+
+	.legal__title {
+		font-size: 40px;
+	}
+
+	.legal__section-title {
+		font-size: 24px;
+	}
+}
+
+@media (min-width: 1024px) {
+	.legal {
+		padding: 8rem 0 6rem;
+	}
+
+	.legal__title {
+		font-size: 48px;
+	}
+}

@@ -73,6 +73,24 @@ function trepied_enqueue_assets(): void
 		file_exists($custom_css_path) ? (string) filemtime($custom_css_path) : $theme_version
 	);
 
+	// Legal page (privacy policy templates): tokens + page-specific styles only
+	if (is_page_template('page-legal.php')) {
+		wp_enqueue_style(
+			'trepied-tokens',
+			get_template_directory_uri() . '/assets/css/tokens.css',
+			['trepied-theme-style'],
+			$theme_version
+		);
+
+		$legal_css_path = get_template_directory() . '/assets/css/legal.css';
+		wp_enqueue_style(
+			'trepied-legal',
+			get_template_directory_uri() . '/assets/css/legal.css',
+			['trepied-tokens'],
+			file_exists($legal_css_path) ? (string) filemtime($legal_css_path) : $theme_version
+		);
+	}
+
 	// Tailwind CDN - load in footer. Not deferred: the inline config below
 	// must run immediately after this script executes and defines `tailwind`.
 	wp_register_script('trepied-tailwind', 'https://cdn.tailwindcss.com', [], null, true);

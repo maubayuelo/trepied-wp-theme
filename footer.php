@@ -11,6 +11,13 @@ if (!defined('ABSPATH')) {
 		</div>
 		<div class="text-[14px] text-[#6a6a6a] flex flex-wrap items-center gap-x-2 gap-y-1">
 			<span>© <?php echo date('Y'); ?> Trépied. <?php echo esc_html__('Video Production — Montreal', 'trepied'); ?></span>
+			<?php $privacy_policy_url = trepied_get_privacy_policy_url(); ?>
+			<?php if ($privacy_policy_url) : ?>
+			<span aria-hidden="true">·</span>
+			<a href="<?php echo esc_url($privacy_policy_url); ?>" class="hover:opacity-60 transition-opacity">
+				<?php echo esc_html__('Privacy Policy', 'trepied'); ?>
+			</a>
+			<?php endif; ?>
 			<span aria-hidden="true">·</span>
 			<button type="button" id="magneto-consent-manage" class="magneto-consent-manage-link hover:opacity-60 transition-opacity">
 				<?php echo esc_html__('Manage Cookies', 'trepied'); ?>

@@ -16,4 +16,8 @@
 
 	--trepied-font-sans: 'Inter', sans-serif;
 	--trepied-font-condensed: 'Barlow Condensed', sans-serif;
+
+	/* Fixed nav height (header.php .h-20). Measured 80px at 375/768/1440px —
+	   it doesn't vary by breakpoint, only the nav's horizontal padding does. */
+	--header-height: 80px;
 }

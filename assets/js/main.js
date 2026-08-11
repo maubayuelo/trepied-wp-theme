@@ -266,25 +266,6 @@ function handleSwipe() {
     }
 }
 
-document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener('click', function (event) {
-        const href = this.getAttribute('href');
-        if (href === '#' || href === '') {
-            return;
-        }
-
-        event.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-            const offsetTop = target.offsetTop - 80;
-            window.scrollTo({
-                top: offsetTop,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
 document.addEventListener('DOMContentLoaded', () => {
     // Set up testimonial dot click handlers
     document.querySelectorAll('.testimonial-dot').forEach((dot) => {

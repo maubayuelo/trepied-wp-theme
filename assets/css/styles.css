@@ -32,6 +32,13 @@ h2,
 /* Smooth scrolling */
 html {
     scroll-behavior: smooth;
+    /* Offset for the fixed nav so anchor targets don't land underneath it.
+       Applies to every native fragment scroll on this document — clicks,
+       arriving with a #hash from another page, and reloading with one
+       already in the URL — not just JS-driven scrolls. Deliberately plain
+       CSS instead of a Tailwind scroll-pt-* class: this value is
+       layout-critical and must never depend on the CDN's runtime purge. */
+    scroll-padding-top: var(--header-height, 80px);
 }
 
 /* Custom scrollbar */

@@ -217,7 +217,7 @@ add_action('wp_head', 'trepied_add_meta_description', 1);
  */
 function trepied_defer_scripts(string $tag, string $handle, string $src): string {
 	// Scripts that should be deferred
-	$defer_scripts = ['trepied-lucide', 'trepied-main'];
+	$defer_scripts = ['trepied-lucide', 'trepied-modal', 'trepied-main'];
 	
 	if (in_array($handle, $defer_scripts, true)) {
 		return str_replace(' src', ' defer src', $tag);

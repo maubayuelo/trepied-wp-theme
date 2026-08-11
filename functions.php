@@ -68,12 +68,13 @@ function trepied_enqueue_assets(): void
 		file_exists($custom_css_path) ? (string) filemtime($custom_css_path) : $theme_version
 	);
 
-	// Tailwind CDN - load in head (required for styling)
-	wp_register_script('trepied-tailwind', 'https://cdn.tailwindcss.com', [], null, false);
+	// Tailwind CDN - load in footer. Not deferred: the inline config below
+	// must run immediately after this script executes and defines `tailwind`.
+	wp_register_script('trepied-tailwind', 'https://cdn.tailwindcss.com', [], null, true);
 	wp_add_inline_script(
 		'trepied-tailwind',
 		"tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif'],condensed:['Barlow Condensed','sans-serif']},colors:{cream:'#f5f3ed','accent-red':'#ff0000'}}}};",
-		'before'
+		'after'
 	);
 	wp_enqueue_script('trepied-tailwind');
 
@@ -104,19 +105,32 @@ function trepied_add_resource_hints(): void {
 	// Preconnect to Google Fonts (critical)
 	echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
 	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
-	
+
 	// Preconnect to CDNs used by the theme
 	echo '<link rel="preconnect" href="https://unpkg.com" crossorigin>' . "\n";
 	echo '<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>' . "\n";
-	
+
 	// DNS prefetch for Calendly (loaded on interaction)
 	echo '<link rel="dns-prefetch" href="https://assets.calendly.com">' . "\n";
-	
-	// DNS prefetch for YouTube (if videos are used)
+
+	// DNS prefetch for YouTube
 	echo '<link rel="dns-prefetch" href="https://www.youtube-nocookie.com">' . "\n";
 	echo '<link rel="dns-prefetch" href="https://i.ytimg.com">' . "\n";
+
+	// Robots meta: index all pages by default
+	echo '<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">' . "\n";
 }
 add_action('wp_head', 'trepied_add_resource_hints', 1);
+
+function trepied_favicons(): void {
+	$dir = get_template_directory_uri() . '/assets/images/favicons';
+	echo '<link rel="icon" type="image/x-icon" href="' . esc_url($dir . '/favicon.ico') . '">' . "\n";
+	echo '<link rel="icon" type="image/png" sizes="16x16" href="' . esc_url($dir . '/favicon-16x16.png') . '">' . "\n";
+	echo '<link rel="icon" type="image/png" sizes="32x32" href="' . esc_url($dir . '/favicon-32x32.png') . '">' . "\n";
+	echo '<link rel="apple-touch-icon" sizes="180x180" href="' . esc_url($dir . '/apple-touch-icon.png') . '">' . "\n";
+	echo '<link rel="manifest" href="' . esc_url($dir . '/site.webmanifest') . '">' . "\n";
+}
+add_action('wp_head', 'trepied_favicons', 1);
 
 /**
  * Add meta description for SEO
@@ -311,3 +325,174 @@ function trepied_language_switcher(string $separator = ' / '): string
 function trepied_is_multilingual_active(): bool {
 	return function_exists('icl_get_languages') || function_exists('pll_the_languages');
 }
+
+/**
+ * Add canonical URL tag
+ */
+function trepied_add_canonical(): void {
+	if (defined('WPSEO_VERSION') || defined('RANK_MATH_VERSION') || defined('AIOSEO_VERSION')) {
+		return;
+	}
+
+	$canonical = '';
+
+	if (is_front_page()) {
+		$canonical = home_url('/');
+	} elseif (is_singular()) {
+		$canonical = get_permalink();
+	} elseif (is_category() || is_tag() || is_tax()) {
+		$canonical = get_term_link(get_queried_object());
+	}
+
+	if (!empty($canonical) && !is_wp_error($canonical)) {
+		echo '<link rel="canonical" href="' . esc_url($canonical) . '">' . "\n";
+	}
+}
+add_action('wp_head', 'trepied_add_canonical', 1);
+
+/**
+ * Add Open Graph and Twitter Card meta tags
+ */
+function trepied_add_social_meta(): void {
+	if (defined('WPSEO_VERSION') || defined('RANK_MATH_VERSION') || defined('AIOSEO_VERSION')) {
+		return;
+	}
+
+	$title       = wp_get_document_title();
+	$description = get_bloginfo('description');
+	$url         = is_front_page() ? home_url('/') : (is_singular() ? get_permalink() : home_url('/'));
+	$type        = is_singular() ? 'article' : 'website';
+	$image       = '';
+	$site_name   = get_bloginfo('name');
+
+	// Try to get a relevant image
+	if (is_singular() && has_post_thumbnail()) {
+		$thumb = wp_get_attachment_image_src(get_post_thumbnail_id(), 'large');
+		if ($thumb) {
+			$image = $thumb[0];
+		}
+	}
+
+	// Fallback: ACF hero image
+	if (empty($image) && function_exists('get_field')) {
+		$hero = get_field('hero', 'option');
+		if (empty($hero)) {
+			$hero = get_field('hero');
+		}
+		if (!empty($hero['image']['url'])) {
+			$image = $hero['image']['url'];
+		}
+	}
+
+	echo '<meta property="og:type" content="' . esc_attr($type) . '">' . "\n";
+	echo '<meta property="og:title" content="' . esc_attr($title) . '">' . "\n";
+	echo '<meta property="og:description" content="' . esc_attr(substr(wp_strip_all_tags($description), 0, 160)) . '">' . "\n";
+	echo '<meta property="og:url" content="' . esc_url($url) . '">' . "\n";
+	echo '<meta property="og:site_name" content="' . esc_attr($site_name) . '">' . "\n";
+	echo '<meta property="og:locale" content="' . esc_attr(get_locale()) . '">' . "\n";
+
+	if (!empty($image)) {
+		echo '<meta property="og:image" content="' . esc_url($image) . '">' . "\n";
+		echo '<meta property="og:image:width" content="1200">' . "\n";
+		echo '<meta property="og:image:height" content="630">' . "\n";
+	}
+
+	echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
+	echo '<meta name="twitter:title" content="' . esc_attr($title) . '">' . "\n";
+	echo '<meta name="twitter:description" content="' . esc_attr(substr(wp_strip_all_tags($description), 0, 160)) . '">' . "\n";
+
+	if (!empty($image)) {
+		echo '<meta name="twitter:image" content="' . esc_url($image) . '">' . "\n";
+	}
+}
+add_action('wp_head', 'trepied_add_social_meta', 5);
+
+/**
+ * Add JSON-LD structured data (Organization + LocalBusiness + VideoProductionService)
+ */
+function trepied_add_schema(): void {
+	if (!is_front_page()) {
+		return;
+	}
+
+	$site_name = get_bloginfo('name');
+	$site_url  = home_url('/');
+	$logo_url  = get_template_directory_uri() . '/assets/images/symbol.png';
+
+	$schema = [
+		'@context' => 'https://schema.org',
+		'@graph'   => [
+			[
+				'@type'       => ['Organization', 'LocalBusiness', 'ProfessionalService'],
+				'@id'         => $site_url . '#organization',
+				'name'        => $site_name,
+				'url'         => $site_url,
+				'logo'        => [
+					'@type' => 'ImageObject',
+					'url'   => $logo_url,
+				],
+				'description' => get_bloginfo('description'),
+				'address'     => [
+					'@type'            => 'PostalAddress',
+					'addressLocality'  => 'Montreal',
+					'addressRegion'    => 'QC',
+					'addressCountry'   => 'CA',
+				],
+				'areaServed'  => ['Montreal', 'Quebec', 'Canada'],
+				'serviceType' => ['Video Production', 'Corporate Video', 'Commercial Production', 'Documentary'],
+				'knowsLanguage' => ['fr', 'en'],
+				'sameAs'      => [
+					'https://instagram.com',
+					'https://youtube.com',
+				],
+			],
+			[
+				'@type'           => 'WebSite',
+				'@id'             => $site_url . '#website',
+				'url'             => $site_url,
+				'name'            => $site_name,
+				'publisher'       => ['@id' => $site_url . '#organization'],
+				'inLanguage'      => ['fr-CA', 'en-CA'],
+			],
+		],
+	];
+
+	echo '<script type="application/ld+json">' . wp_json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . '</script>' . "\n";
+}
+add_action('wp_head', 'trepied_add_schema', 5);
+
+/**
+ * Preload hero image for faster LCP
+ * Outputs a <link rel="preload"> for the ACF hero image on front page
+ */
+function trepied_preload_hero_image(): void {
+	if (!is_front_page()) {
+		return;
+	}
+
+	if (!function_exists('get_field')) {
+		return;
+	}
+
+	$hero = get_field('hero');
+	if (empty($hero['image']['id'])) {
+		return;
+	}
+
+	$image_id  = $hero['image']['id'];
+	$image_src = wp_get_attachment_image_src($image_id, 'trepied-hero');
+	if (!$image_src) {
+		return;
+	}
+
+	// Build srcset for responsive preload
+	$srcset = wp_get_attachment_image_srcset($image_id, 'trepied-hero');
+
+	echo '<link rel="preload" as="image" href="' . esc_url($image_src[0]) . '"';
+	if ($srcset) {
+		echo ' imagesrcset="' . esc_attr($srcset) . '"';
+		echo ' imagesizes="(max-width: 768px) 100vw, (max-width: 1400px) 100vw, 1400px"';
+	}
+	echo '>' . "\n";
+}
+add_action('wp_head', 'trepied_preload_hero_image', 2);

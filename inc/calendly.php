@@ -103,27 +103,20 @@ function trepied_calendly_inline_script(): void {
 	(function() {
 		var calendlyLoaded = false;
 		var calendlyLoading = false;
-		var pendingUrl = null;
+		var pendingCallbacks = [];
 
 		function loadCalendly(callback) {
 			if (calendlyLoaded) {
-				callback();
-				return;
-			}
-			if (calendlyLoading) {
-				// Wait for loading to complete
-				var checkInterval = setInterval(function() {
-					if (calendlyLoaded) {
-						clearInterval(checkInterval);
-						callback();
-					}
-				}, 50);
+				if (callback) callback();
 				return;
 			}
 
+			if (callback) pendingCallbacks.push(callback);
+
+			if (calendlyLoading) return;
 			calendlyLoading = true;
 
-			// Load CSS
+			// Load CSS (non-blocking)
 			var link = document.createElement('link');
 			link.rel = 'stylesheet';
 			link.href = 'https://assets.calendly.com/assets/external/widget.css';
@@ -136,10 +129,12 @@ function trepied_calendly_inline_script(): void {
 			script.onload = function() {
 				calendlyLoaded = true;
 				calendlyLoading = false;
-				callback();
+				pendingCallbacks.forEach(function(cb) { cb(); });
+				pendingCallbacks = [];
 			};
 			script.onerror = function() {
 				calendlyLoading = false;
+				pendingCallbacks = [];
 				console.error('Failed to load Calendly');
 			};
 			document.body.appendChild(script);
@@ -151,7 +146,14 @@ function trepied_calendly_inline_script(): void {
 			}
 		}
 
-		// Event delegation for all Calendly triggers
+		// Start loading in background when page is idle — so it's ready before user clicks
+		if ('requestIdleCallback' in window) {
+			requestIdleCallback(function() { loadCalendly(null); }, { timeout: 3000 });
+		} else {
+			setTimeout(function() { loadCalendly(null); }, 2000);
+		}
+
+		// Click: open immediately (assets likely already loaded)
 		document.addEventListener('click', function(e) {
 			var trigger = e.target.closest('.calendly-popup-trigger');
 			if (!trigger) return;
@@ -163,21 +165,6 @@ function trepied_calendly_inline_script(): void {
 				openCalendly(url);
 			});
 		});
-
-		// Preload on hover/touch for faster interaction
-		document.addEventListener('mouseenter', function(e) {
-			var trigger = e.target.closest('.calendly-popup-trigger');
-			if (trigger && !calendlyLoaded && !calendlyLoading) {
-				loadCalendly(function() {});
-			}
-		}, true);
-
-		document.addEventListener('touchstart', function(e) {
-			var trigger = e.target.closest('.calendly-popup-trigger');
-			if (trigger && !calendlyLoaded && !calendlyLoading) {
-				loadCalendly(function() {});
-			}
-		}, { passive: true });
 	})();
 	</script>
 	<?php

@@ -9,8 +9,9 @@ get_header();
 $hero = trepied_get_group('hero');
 $hero_copy = $hero['copy'] ?? '';
 $hero_subtitle = $hero['subtitle'] ?? '';
-$hero_video = $hero['video'] ?? '';
-$hero_image = $hero['image'] ?? null;
+$hero_video        = $hero['video'] ?? '';
+$hero_video_mobile = $hero['video_mobile'] ?? '';
+$hero_image        = $hero['image'] ?? null;
 ?>
 
 <section class="pt-32 pb-12 md:pt-44 md:pb-16 px-8 md:px-16 lg:px-24">
@@ -44,7 +45,14 @@ $hero_image = $hero['image'] ?? null;
 		<?php if ($hero_video || ($hero_image && !empty($hero_image['id']))) : ?>
 		<div class="relative w-full h-[400px] md:h-[580px] rounded-2xl overflow-hidden">
 			<?php if ($hero_video) : ?>
-				<iframe src="https://www.youtube-nocookie.com/embed/<?php echo esc_attr($hero_video); ?>?autoplay=1&amp;mute=1&amp;loop=1&amp;playlist=<?php echo esc_attr($hero_video); ?>&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;showinfo=0&amp;iv_load_policy=3&amp;disablekb=1&amp;fs=0" title="" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77%] h-[177.77%] pointer-events-none" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+				<video
+					class="absolute top-1/2 left-0 -translate-y-1/2 w-full h-[105%] object-cover pointer-events-none"
+					autoplay muted loop playsinline>
+					<?php if ($hero_video_mobile) : ?>
+					<source media="(max-width: 1023px)" src="<?php echo esc_url($hero_video_mobile); ?>" type="video/mp4">
+					<?php endif; ?>
+					<source src="<?php echo esc_url($hero_video); ?>" type="video/mp4">
+				</video>
 			<?php elseif ($hero_image && !empty($hero_image['id'])) : ?>
 				<?php echo wp_get_attachment_image($hero_image['id'], 'trepied-hero', false, [
 					'class' => 'absolute inset-0 w-full h-full object-cover',

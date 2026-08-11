@@ -52,7 +52,9 @@ function openProjectModal(projectCard) {
     const longDescriptionTemplate = projectCard.querySelector('.project-long-description');
     const longDescription = longDescriptionTemplate ? longDescriptionTemplate.innerHTML : '';
 
-    const videoUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+    const videoUrl = videoId
+        ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&cc_load_policy=0&fs=0&playsinline=1`
+        : '';
 
     modalContent.innerHTML = `
         <div class="p-6 md:p-6">

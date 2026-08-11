@@ -9,8 +9,12 @@ if (!defined('ABSPATH')) {
 		<div class="text-[15px] font-black tracking-[0.02em] uppercase">
 			Trépied
 		</div>
-		<div class="text-[14px] text-[#6a6a6a]">
-			© <?php echo date('Y'); ?> Trépied. <?php echo esc_html__('Video Production — Montreal', 'trepied'); ?>
+		<div class="text-[14px] text-[#6a6a6a] flex flex-wrap items-center gap-x-2 gap-y-1">
+			<span>© <?php echo date('Y'); ?> Trépied. <?php echo esc_html__('Video Production — Montreal', 'trepied'); ?></span>
+			<span aria-hidden="true">·</span>
+			<button type="button" id="magneto-consent-manage" class="magneto-consent-manage-link hover:opacity-60 transition-opacity">
+				<?php echo esc_html__('Manage Cookies', 'trepied'); ?>
+			</button>
 		</div>
 		<div class="flex items-center gap-4">
 			<a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="Instagram">

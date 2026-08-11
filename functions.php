@@ -9,6 +9,11 @@ if (!defined('ABSPATH')) {
 require_once get_template_directory() . '/inc/options.php';
 
 /**
+ * Include Loi 25 consent banner
+ */
+require_once get_template_directory() . '/inc/consent/consent.php';
+
+/**
  * Include ACF helper functions
  */
 require_once get_template_directory() . '/inc/acf.php';
@@ -73,15 +78,16 @@ function trepied_enqueue_assets(): void
 		file_exists($custom_css_path) ? (string) filemtime($custom_css_path) : $theme_version
 	);
 
-	// Legal page (privacy policy templates): tokens + page-specific styles only
-	if (is_page_template('page-legal.php')) {
-		wp_enqueue_style(
-			'trepied-tokens',
-			get_template_directory_uri() . '/assets/css/tokens.css',
-			['trepied-theme-style'],
-			$theme_version
-		);
+	// Design tokens: sitewide (consent banner + legal pages both need them)
+	wp_enqueue_style(
+		'trepied-tokens',
+		get_template_directory_uri() . '/assets/css/tokens.css',
+		['trepied-theme-style'],
+		$theme_version
+	);
 
+	// Legal page (privacy policy templates): page-specific styles only
+	if (is_page_template('page-legal.php')) {
 		$legal_css_path = get_template_directory() . '/assets/css/legal.css';
 		wp_enqueue_style(
 			'trepied-legal',

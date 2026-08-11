@@ -1,0 +1,280 @@
+/*
+ * Loi 25 consent banner + preference panel.
+ * Prefixed with .magneto-consent to avoid collisions with theme classes.
+ * Positioned fixed/off-flow so injecting it never shifts existing layout (CLS = 0).
+ */
+
+.magneto-consent-banner {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 9999;
+	transform: translateY(100%);
+	transition: transform 0.3s ease;
+	background: var(--trepied-color-bg);
+	border-top: 1px solid var(--trepied-color-border);
+	box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.12);
+	padding: 1.25rem 1rem;
+}
+
+.magneto-consent-banner.is-visible {
+	transform: translateY(0);
+}
+
+.magneto-consent-banner__inner {
+	max-width: 1100px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.magneto-consent-banner__text {
+	font-family: var(--trepied-font-sans);
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--trepied-color-ink);
+	margin: 0;
+}
+
+.magneto-consent-banner__text a {
+	color: var(--trepied-color-ink);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.magneto-consent-banner__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+}
+
+/* Accept / Refuse MUST stay visually identical: same size, same border
+   weight, same contrast. This is a Loi 25 legal requirement, not a
+   styling preference — do not make "reject" a smaller/muted link. */
+.magneto-consent-btn {
+	font-family: var(--trepied-font-sans);
+	font-size: 14px;
+	font-weight: 600;
+	padding: 0.7rem 1.5rem;
+	border-radius: 9999px;
+	border: 2px solid var(--trepied-color-ink);
+	cursor: pointer;
+	transition: all 0.2s ease;
+	white-space: nowrap;
+}
+
+.magneto-consent-btn--accept,
+.magneto-consent-btn--reject {
+	background: var(--trepied-color-ink);
+	color: var(--trepied-color-white);
+}
+
+.magneto-consent-btn--accept:hover,
+.magneto-consent-btn--reject:hover {
+	background: var(--trepied-color-accent);
+	border-color: var(--trepied-color-accent);
+}
+
+.magneto-consent-btn--customize {
+	background: transparent;
+	color: var(--trepied-color-ink);
+}
+
+.magneto-consent-btn--customize:hover {
+	background: var(--trepied-color-ink);
+	color: var(--trepied-color-white);
+}
+
+@media (min-width: 640px) {
+	.magneto-consent-banner__inner {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.magneto-consent-banner__text {
+		flex: 1;
+	}
+}
+
+/* Preference panel */
+.magneto-consent-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+	background: rgba(0, 0, 0, 0.5);
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 1rem;
+}
+
+.magneto-consent-backdrop.is-visible {
+	display: flex;
+}
+
+.magneto-consent-panel {
+	background: var(--trepied-color-bg);
+	border-radius: 1rem;
+	max-width: 520px;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	padding: 1.75rem;
+	position: relative;
+}
+
+.magneto-consent-panel__close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	background: var(--trepied-color-ink);
+	color: var(--trepied-color-white);
+	border: none;
+	border-radius: 9999px;
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+	font-size: 18px;
+	line-height: 1;
+}
+
+.magneto-consent-panel__title {
+	font-family: var(--trepied-font-condensed);
+	font-weight: 700;
+	font-size: 22px;
+	margin: 0 0.5rem 0.5rem 0;
+	padding-right: 2rem;
+}
+
+.magneto-consent-panel__intro {
+	font-family: var(--trepied-font-sans);
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--trepied-color-text-secondary);
+	margin: 0 0 1.5rem;
+}
+
+.magneto-consent-category {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 1rem 0;
+	border-top: 1px solid var(--trepied-color-border);
+}
+
+.magneto-consent-category__text {
+	flex: 1;
+}
+
+.magneto-consent-category__label {
+	font-family: var(--trepied-font-sans);
+	font-weight: 600;
+	font-size: 15px;
+	color: var(--trepied-color-ink);
+	margin: 0 0 0.25rem;
+}
+
+.magneto-consent-category__desc {
+	font-family: var(--trepied-font-sans);
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--trepied-color-text-secondary);
+	margin: 0;
+}
+
+/* Toggle switch */
+.magneto-consent-toggle {
+	position: relative;
+	display: inline-block;
+	width: 44px;
+	height: 24px;
+	flex-shrink: 0;
+}
+
+.magneto-consent-toggle input {
+	position: absolute;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	cursor: pointer;
+}
+
+.magneto-consent-toggle input:disabled {
+	cursor: not-allowed;
+}
+
+.magneto-consent-toggle__track {
+	position: absolute;
+	inset: 0;
+	background: var(--trepied-color-border);
+	border-radius: 9999px;
+	transition: background 0.2s ease;
+}
+
+.magneto-consent-toggle__thumb {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 20px;
+	height: 20px;
+	background: var(--trepied-color-white);
+	border-radius: 50%;
+	transition: transform 0.2s ease;
+}
+
+.magneto-consent-toggle input:checked ~ .magneto-consent-toggle__track {
+	background: var(--trepied-color-ink);
+}
+
+.magneto-consent-toggle input:checked ~ .magneto-consent-toggle__thumb {
+	transform: translateX(20px);
+}
+
+.magneto-consent-toggle input:focus-visible ~ .magneto-consent-toggle__track {
+	outline: 2px solid var(--trepied-color-accent);
+	outline-offset: 2px;
+}
+
+.magneto-consent-panel__save {
+	width: 100%;
+	margin-top: 1.5rem;
+	font-family: var(--trepied-font-sans);
+	font-size: 14px;
+	font-weight: 600;
+	padding: 0.85rem 1.5rem;
+	border-radius: 9999px;
+	border: 2px solid var(--trepied-color-ink);
+	background: var(--trepied-color-ink);
+	color: var(--trepied-color-white);
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.magneto-consent-panel__save:hover {
+	background: var(--trepied-color-accent);
+	border-color: var(--trepied-color-accent);
+}
+
+/* Footer "Manage cookies" trigger */
+.magneto-consent-manage-link {
+	background: none;
+	border: none;
+	padding: 0;
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.magneto-consent-manage-link:hover {
+	opacity: 0.6;
+}
+
+body.magneto-consent-lock {
+	overflow: hidden;
+}

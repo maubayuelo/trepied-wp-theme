@@ -9,17 +9,17 @@ if (!defined('ABSPATH')) {
 		<div class="text-[15px] font-black tracking-[0.02em] uppercase">
 			Trépied
 		</div>
-		<div class="text-[14px] text-[#6a6a6a] flex flex-wrap items-center gap-x-2 gap-y-1">
+		<div class="text-[14px] text-[#6a6a6a] flex flex-col items-start gap-1 lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-2 lg:gap-y-1">
 			<span>© <?php echo date('Y'); ?> Trépied. <?php echo esc_html__('Video production — Montréal', 'trepied'); ?></span>
 			<?php $privacy_policy_url = trepied_get_privacy_policy_url(); ?>
 			<?php if ($privacy_policy_url) : ?>
-			<span aria-hidden="true">·</span>
-			<a href="<?php echo esc_url($privacy_policy_url); ?>" class="hover:opacity-60 transition-opacity">
+			<span aria-hidden="true" class="hidden lg:inline">·</span>
+			<a href="<?php echo esc_url($privacy_policy_url); ?>" class="hover:opacity-60 transition-opacity min-h-[44px] flex items-center lg:min-h-0">
 				<?php echo esc_html__('Privacy Policy', 'trepied'); ?>
 			</a>
 			<?php endif; ?>
-			<span aria-hidden="true">·</span>
-			<button type="button" id="magneto-consent-manage" class="magneto-consent-manage-link hover:opacity-60 transition-opacity" aria-haspopup="dialog" aria-expanded="false">
+			<span aria-hidden="true" class="hidden lg:inline">·</span>
+			<button type="button" id="magneto-consent-manage" class="magneto-consent-manage-link hover:opacity-60 transition-opacity min-h-[44px] flex items-center lg:min-h-0" aria-haspopup="dialog" aria-expanded="false">
 				<?php echo esc_html__('Manage Cookies', 'trepied'); ?>
 			</button>
 		</div>

@@ -417,11 +417,6 @@ $cta_paragraph = $cta['paragraph'] ?? '';
 							<?php echo esc_html__('Request a Quote', 'trepied'); ?>
 						</button>
 					</div>
-					<div>
-						<a href="#" class="inline-block px-7 py-3 border-2 border-black text-black text-[15px] hover:bg-accent-red hover:text-white hover:border-accent-red transition-all duration-300 rounded-full">
-							<?php echo esc_html__('WhatsApp', 'trepied'); ?>
-						</a>
-					</div>
 				</div>
 			</div>
 		</div>

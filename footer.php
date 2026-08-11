@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 			Trépied
 		</div>
 		<div class="text-[14px] text-[#6a6a6a] flex flex-wrap items-center gap-x-2 gap-y-1">
-			<span>© <?php echo date('Y'); ?> Trépied. <?php echo esc_html__('Video Production — Montreal', 'trepied'); ?></span>
+			<span>© <?php echo date('Y'); ?> Trépied. <?php echo esc_html__('Video production — Montréal', 'trepied'); ?></span>
 			<?php $privacy_policy_url = trepied_get_privacy_policy_url(); ?>
 			<?php if ($privacy_policy_url) : ?>
 			<span aria-hidden="true">·</span>
@@ -24,14 +24,14 @@ if (!defined('ABSPATH')) {
 			</button>
 		</div>
 		<div class="flex items-center gap-4">
-			<a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="Instagram">
+			<a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('Instagram', 'trepied'); ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#1a1a1a]">
 					<rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
 					<path d="M16 11.37a4 4 0 1 1-7.914 1.174A4 4 0 0 1 16 11.37z"></path>
 					<line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
 				</svg>
 			</a>
-			<a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="YouTube">
+			<a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('YouTube', 'trepied'); ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#1a1a1a]">
 					<path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path>
 					<path d="m10 15 5-3-5-3z"></path>

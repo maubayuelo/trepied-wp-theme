@@ -4,6 +4,11 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Include theme options page (analytics IDs, legal contact info)
+ */
+require_once get_template_directory() . '/inc/options.php';
+
+/**
  * Include ACF helper functions
  */
 require_once get_template_directory() . '/inc/acf.php';

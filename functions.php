@@ -115,12 +115,22 @@ function trepied_enqueue_assets(): void
 	// Lucide icons - load in footer, defer
 	wp_enqueue_script('trepied-lucide', 'https://unpkg.com/lucide@latest/dist/umd/lucide.min.js', [], null, true);
 
+	// Reusable accessible dialog module (focus trap, Esc, backdrop, scroll lock)
+	$modal_js_path = get_template_directory() . '/assets/js/modal.js';
+	wp_enqueue_script(
+		'trepied-modal',
+		get_template_directory_uri() . '/assets/js/modal.js',
+		[],
+		file_exists($modal_js_path) ? (string) filemtime($modal_js_path) : $theme_version,
+		true
+	);
+
 	// Main JS - load in footer with file-based versioning
 	$main_js_path = get_template_directory() . '/assets/js/main.js';
 	wp_enqueue_script(
 		'trepied-main',
 		get_template_directory_uri() . '/assets/js/main.js',
-		['trepied-lucide'],
+		['trepied-lucide', 'trepied-modal'],
 		file_exists($main_js_path) ? (string) filemtime($main_js_path) : $theme_version,
 		true
 	);

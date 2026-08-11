@@ -37,12 +37,20 @@ mobileMenuLinks.forEach((link) => {
     });
 });
 
-// Project modal: reads data from DOM attributes
-function openProjectModal(projectCard) {
-    const modal = document.getElementById('project-modal');
-    const modalContent = document.getElementById('modal-content');
+// Project modal: reads data from DOM attributes.
+// The video <iframe> is created with document.createElement only when the
+// modal opens, and the whole #modal-content subtree is torn down with
+// replaceChildren() on every close path (X, Esc, backdrop) so the iframe
+// is fully removed from the DOM instead of just hidden — otherwise a
+// hidden-but-still-mounted YouTube iframe keeps playing audio.
+const projectModal = document.getElementById('project-modal');
+const projectModalDialog = projectModal ? projectModal.querySelector('.project-modal__dialog') : null;
+const modalContent = document.getElementById('modal-content');
 
-    if (!modal || !modalContent || !projectCard) {
+let pendingProjectCard = null;
+
+function renderProjectModalContent(projectCard) {
+    if (!modalContent || !projectCard) {
         return;
     }
 
@@ -52,18 +60,10 @@ function openProjectModal(projectCard) {
     const longDescriptionTemplate = projectCard.querySelector('.project-long-description');
     const longDescription = longDescriptionTemplate ? longDescriptionTemplate.innerHTML : '';
 
-    const videoUrl = videoId
-        ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&cc_load_policy=0&fs=0&playsinline=1`
-        : '';
-
     modalContent.innerHTML = `
         <div class="p-6 md:p-6">
-            ${videoUrl ? `
-            <div class="relative w-full aspect-video rounded-2xl overflow-hidden">
-                <iframe src="${videoUrl}" title="${title}" class="absolute inset-0 w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-            ` : ''}
-            <h3 class="text-[28px] md:text-[30px] leading-[1.2] font-bold mb-3 mt-4 text-black font-condensed">
+            ${videoId ? '<div class="project-modal__video-slot relative w-full aspect-video rounded-2xl overflow-hidden"></div>' : ''}
+            <h3 id="project-modal-title" class="text-[28px] md:text-[30px] leading-[1.2] font-bold mb-3 mt-4 text-black font-condensed">
                 ${title}
             </h3>
             ${client ? `<p class="text-[17px] md:text-[17px] font-bold mb-3 text-[#1a1a1a]">${client}</p>` : ''}
@@ -71,12 +71,34 @@ function openProjectModal(projectCard) {
         </div>
     `;
 
-    modal.classList.remove('hidden');
-    modal.classList.add('show');
-    document.body.classList.add('modal-open');
-    document.body.style.overflow = 'hidden';
+    if (videoId) {
+        const videoSlot = modalContent.querySelector('.project-modal__video-slot');
+        if (videoSlot) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&disablekb=1&cc_load_policy=0&fs=0&playsinline=1`;
+            iframe.title = title;
+            iframe.className = 'absolute inset-0 w-full h-full';
+            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+            iframe.allowFullscreen = true;
+            videoSlot.appendChild(iframe);
+        }
+    }
 
     recreateIcons();
+}
+
+let projectModalInstance = null;
+if (projectModal && projectModalDialog && modalContent) {
+    projectModalInstance = window.TrepiedModal.create({
+        root: projectModal,
+        dialog: projectModalDialog,
+        onOpen: () => renderProjectModalContent(pendingProjectCard),
+        onClose: () => {
+            // Destroys the iframe (and everything else) completely —
+            // display:none alone would leave it mounted and playing audio.
+            modalContent.replaceChildren();
+        },
+    });
 }
 
 // Set up project modal triggers
@@ -84,41 +106,20 @@ document.querySelectorAll('.project-modal-trigger').forEach((trigger) => {
     trigger.addEventListener('click', (event) => {
         event.preventDefault();
         const projectCard = trigger.closest('.project-card');
-        if (projectCard) {
-            openProjectModal(projectCard);
+        if (projectCard && projectModalInstance) {
+            pendingProjectCard = projectCard;
+            projectModalInstance.open(trigger);
         }
     });
 });
 
-function closeProjectModal() {
-    const modal = document.getElementById('project-modal');
-    if (!modal) {
-        return;
-    }
-
-    modal.classList.add('hidden');
-    modal.classList.remove('show');
-    document.body.classList.remove('modal-open');
-    document.body.style.overflow = '';
-}
-
 const modalCloseBtn = document.getElementById('modal-close');
-if (modalCloseBtn) {
-    modalCloseBtn.addEventListener('click', closeProjectModal);
-}
-
-const projectModal = document.getElementById('project-modal');
-if (projectModal) {
-    projectModal.addEventListener('click', (event) => {
-        if (event.target === projectModal) {
-            closeProjectModal();
-        }
-    });
+if (modalCloseBtn && projectModalInstance) {
+    modalCloseBtn.addEventListener('click', () => projectModalInstance.close());
 }
 
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-        closeProjectModal();
         closeQuoteModal();
     }
 });

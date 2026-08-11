@@ -35,9 +35,9 @@ if (!defined('ABSPATH')) {
 </footer>
 
 <div id="project-modal" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 md:p-8 hidden">
-	<div class="bg-cream rounded-2xl w-full max-w-[1000px] max-h-[90vh] overflow-hidden" style="background-color: #f5f3ed;" onclick="event.stopPropagation()">
+	<div class="project-modal__dialog bg-cream rounded-2xl w-full max-w-[1000px] max-h-[90vh] overflow-hidden" style="background-color: #f5f3ed;" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
 		<div class="relative h-full">
-			<button id="modal-close" class="absolute top-4 right-4 z-20 p-2 bg-black text-white rounded-full hover:bg-accent-red transition-all duration-300" aria-label="Close modal">
+			<button id="modal-close" class="absolute top-4 right-4 z-20 p-2 bg-black text-white rounded-full hover:bg-accent-red transition-all duration-300" aria-label="<?php echo esc_attr__('Close modal', 'trepied'); ?>">
 				<i data-lucide="x" class="w-5 h-5"></i>
 			</button>
 

@@ -15,14 +15,14 @@ if (!defined('ABSPATH')) {
 
 <nav class="fixed top-0 left-0 right-0 z-50 bg-cream/90 backdrop-blur-md">
 	<div class="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24 h-20 flex items-center justify-between">
-		<div class="text-[15px] font-black tracking-[0.02em] uppercase">
+		<a href="<?php echo esc_url(home_url('/')); ?>" class="text-[15px] font-black tracking-[0.02em] uppercase">
 			Trépied
-		</div>
+		</a>
 
 		<div class="hidden md:flex items-center gap-12 text-[15px]">
-			<a href="#services" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('Services', 'trepied'); ?></a>
-			<a href="#projects" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('Work', 'trepied'); ?></a>
-			<a href="#about" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('About', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#services'); ?>" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('Services', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#projects'); ?>" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('Work', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#about'); ?>" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('About', 'trepied'); ?></a>
 			<div class="flex items-center gap-8">
 				<?php if (trepied_is_multilingual_active()) : ?>
 				<div class="flex items-center gap-3">
@@ -54,10 +54,10 @@ if (!defined('ABSPATH')) {
 <div id="mobile-menu" class="fixed inset-0 z-40 transform translate-x-full transition-transform duration-300 ease-in-out md:hidden" style="background-color: #f5f3ed;">
 	<div class="flex flex-col h-full pt-24 px-8 pb-12">
 		<nav class="flex-1 flex flex-col gap-8 text-[18px]">
-			<a href="#services" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('Services', 'trepied'); ?></a>
-			<a href="#projects" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('Work', 'trepied'); ?></a>
-			<a href="#about" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('About', 'trepied'); ?></a>
-			<a href="#contact" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('Contact', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#services'); ?>" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('Services', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#projects'); ?>" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('Work', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#about'); ?>" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('About', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#contact'); ?>" class="mobile-menu-link hover:opacity-60 transition-opacity py-2"><?php echo esc_html__('Contact', 'trepied'); ?></a>
 		</nav>
 
 		<div class="space-y-6 border-t border-[#b0b0b0] pt-8">

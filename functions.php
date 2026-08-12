@@ -262,7 +262,7 @@ add_filter('pre_get_document_title', 'trepied_front_page_document_title', 20);
  */
 function trepied_defer_scripts(string $tag, string $handle, string $src): string {
 	// Scripts that should be deferred
-	$defer_scripts = ['trepied-lucide', 'trepied-modal', 'trepied-main'];
+	$defer_scripts = ['trepied-lucide', 'trepied-modal', 'trepied-main', 'trepied-calendly'];
 	
 	if (in_array($handle, $defer_scripts, true)) {
 		return str_replace(' src', ' defer src', $tag);

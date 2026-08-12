@@ -91,82 +91,30 @@ function trepied_calendly_button(string $text, string $class = '', string $url =
 }
 
 /**
- * Add inline script to load Calendly on-demand
- * Assets only load when user clicks a trigger button (improves LCP)
+ * Enqueue the Calendly click-to-load script.
+ * Assets (assets.calendly.com CSS/JS) only load when a user clicks a
+ * .calendly-popup-trigger button — never preloaded. A preload (even an
+ * idle-time one) would set Calendly cookies before consent, which is the
+ * same Loi 25 gap already closed for GA4 and Meta Pixel.
  */
-function trepied_calendly_inline_script(): void {
+function trepied_enqueue_calendly_assets(): void {
 	if (is_admin()) {
 		return;
 	}
-	?>
-	<script>
-	(function() {
-		var calendlyLoaded = false;
-		var calendlyLoading = false;
-		var pendingCallbacks = [];
 
-		function loadCalendly(callback) {
-			if (calendlyLoaded) {
-				if (callback) callback();
-				return;
-			}
+	$theme_version = wp_get_theme()->get('Version');
+	$js_path = get_template_directory() . '/inc/calendly.js';
 
-			if (callback) pendingCallbacks.push(callback);
+	wp_enqueue_script(
+		'trepied-calendly',
+		get_template_directory_uri() . '/inc/calendly.js',
+		[],
+		file_exists($js_path) ? (string) filemtime($js_path) : $theme_version,
+		true
+	);
 
-			if (calendlyLoading) return;
-			calendlyLoading = true;
-
-			// Load CSS (non-blocking)
-			var link = document.createElement('link');
-			link.rel = 'stylesheet';
-			link.href = 'https://assets.calendly.com/assets/external/widget.css';
-			document.head.appendChild(link);
-
-			// Load JS
-			var script = document.createElement('script');
-			script.src = 'https://assets.calendly.com/assets/external/widget.js';
-			script.async = true;
-			script.onload = function() {
-				calendlyLoaded = true;
-				calendlyLoading = false;
-				pendingCallbacks.forEach(function(cb) { cb(); });
-				pendingCallbacks = [];
-			};
-			script.onerror = function() {
-				calendlyLoading = false;
-				pendingCallbacks = [];
-				console.error('Failed to load Calendly');
-			};
-			document.body.appendChild(script);
-		}
-
-		function openCalendly(url) {
-			if (typeof Calendly !== 'undefined') {
-				Calendly.initPopupWidget({ url: url });
-			}
-		}
-
-		// Start loading in background when page is idle — so it's ready before user clicks
-		if ('requestIdleCallback' in window) {
-			requestIdleCallback(function() { loadCalendly(null); }, { timeout: 3000 });
-		} else {
-			setTimeout(function() { loadCalendly(null); }, 2000);
-		}
-
-		// Click: open immediately (assets likely already loaded)
-		document.addEventListener('click', function(e) {
-			var trigger = e.target.closest('.calendly-popup-trigger');
-			if (!trigger) return;
-
-			e.preventDefault();
-			var url = trigger.dataset.calendlyUrl || '<?php echo esc_js(trepied_get_calendly_url()); ?>';
-
-			loadCalendly(function() {
-				openCalendly(url);
-			});
-		});
-	})();
-	</script>
-	<?php
+	wp_localize_script('trepied-calendly', 'trepiedCalendlyData', [
+		'url' => trepied_get_calendly_url(),
+	]);
 }
-add_action('wp_footer', 'trepied_calendly_inline_script', 99);
+add_action('wp_enqueue_scripts', 'trepied_enqueue_calendly_assets');

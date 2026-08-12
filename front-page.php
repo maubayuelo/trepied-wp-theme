@@ -323,10 +323,12 @@ $about_image_id = is_array($about_image) ? ($about_image['id'] ?? null) : $about
 <?php
 // Get ACF testimonials data
 $testimonials = trepied_get_group('testimonials');
+$testimonials_hidden = !empty($testimonials['hide_testimonies']);
 $testimonials_title = $testimonials['title'] ?? '';
 $testimonials_items = $testimonials['testimonial'] ?? [];
 ?>
 
+<?php if (!$testimonials_hidden) : ?>
 <section class="px-8 md:px-16 lg:px-24 mb-32 md:mb-48 border-b border-[#b0b0b0] pb-32 md:pb-48">
 	<div class="max-w-[1400px] mx-auto">
 		<?php if ($testimonials_title) : ?>
@@ -382,6 +384,7 @@ $testimonials_items = $testimonials['testimonial'] ?? [];
 		<?php endif; ?>
 	</div>
 </section>
+<?php endif; ?>
 
 <?php
 // Get ACF CTA section data

@@ -209,7 +209,20 @@ if (!defined('ABSPATH')) {
 							data-field="gdpr_consent"
 						>
 						<label for="quote_gdpr" class="text-[14px] text-[#4a4a4a] cursor-pointer">
-							<?php echo esc_html__('I agree to the processing of my personal data in accordance with the Privacy Policy.', 'trepied'); ?> <span class="text-accent-red">*</span>
+							<?php
+							$quote_privacy_url = trepied_get_privacy_policy_url();
+							if ($quote_privacy_url) {
+								printf(
+									/* translators: %1$s: opening <a> tag to the privacy policy, %2$s: closing </a> tag */
+									esc_html__('I agree to the processing of my personal data in accordance with the %1$sPrivacy Policy%2$s.', 'trepied'),
+									'<a href="' . esc_url($quote_privacy_url) . '" class="underline hover:opacity-60 transition-opacity">',
+									'</a>'
+								);
+							} else {
+								echo esc_html__('I agree to the processing of my personal data in accordance with the Privacy Policy.', 'trepied');
+							}
+							?>
+							<span class="text-accent-red">*</span>
 						</label>
 					</div>
 

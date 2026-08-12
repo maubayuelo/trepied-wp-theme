@@ -80,6 +80,28 @@ function trepied_register_options_fields(): void
 				'instructions'  => 'Responsible entity shown in the privacy policy / consent panel.',
 				'default_value' => 'Trépied',
 			],
+			[
+				'key'          => 'field_trepied_linkedin_url',
+				'label'        => 'LinkedIn URL',
+				'name'         => 'linkedin_url',
+				'type'         => 'url',
+				'instructions' => 'Single source of truth for the footer social icon and the JSON-LD sameAs — never hardcode this elsewhere.',
+				'default_value' => 'https://www.linkedin.com/in/israel-valencia-833aa341/',
+			],
+			[
+				'key'          => 'field_trepied_instagram_url',
+				'label'        => 'Instagram URL',
+				'name'         => 'instagram_url',
+				'type'         => 'url',
+				'instructions' => 'Leave empty to hide the icon entirely — no placeholder/generic URL. Same source used by the footer and JSON-LD sameAs.',
+			],
+			[
+				'key'          => 'field_trepied_youtube_url',
+				'label'        => 'YouTube URL',
+				'name'         => 'youtube_url',
+				'type'         => 'url',
+				'instructions' => 'Leave empty to hide the icon entirely — no placeholder/generic URL. Same source used by the footer and JSON-LD sameAs.',
+			],
 		],
 		'location' => [
 			[
@@ -112,4 +134,18 @@ function trepied_get_option(string $key): string
 	$value = get_field($key, 'option');
 
 	return is_string($value) ? trim($value) : '';
+}
+
+/**
+ * The site's real social profile URLs — single source of truth for both
+ * the footer icons and the JSON-LD sameAs array, so the two can never
+ * drift out of sync. Only non-empty URLs are included; no placeholders.
+ *
+ * @return string[]
+ */
+function trepied_get_social_urls(): array
+{
+	$urls = array_map('trepied_get_option', ['linkedin_url', 'instagram_url', 'youtube_url']);
+
+	return array_values(array_filter($urls));
 }

@@ -548,44 +548,49 @@ function trepied_add_schema(): void {
 		return;
 	}
 
-	$site_name = get_bloginfo('name');
-	$site_url  = home_url('/');
-	$logo_url  = get_template_directory_uri() . '/assets/images/symbol.png';
+	$site_name   = get_bloginfo('name');
+	$site_url    = home_url('/');
+	$logo_url    = get_template_directory_uri() . '/assets/images/symbol.png';
+	$social_urls = function_exists('trepied_get_social_urls') ? trepied_get_social_urls() : [];
+
+	$organization = [
+		'@type'       => ['Organization', 'LocalBusiness', 'ProfessionalService'],
+		'@id'         => $site_url . '#organization',
+		'name'        => $site_name,
+		'url'         => $site_url,
+		'logo'        => [
+			'@type' => 'ImageObject',
+			'url'   => $logo_url,
+		],
+		'description' => trepied_get_front_page_seo_description(),
+		'address'     => [
+			'@type'            => 'PostalAddress',
+			'addressLocality'  => 'Montreal',
+			'addressRegion'    => 'QC',
+			'addressCountry'   => 'CA',
+		],
+		'areaServed'  => ['Montreal', 'Quebec', 'Canada'],
+		'serviceType' => ['Video Production', 'Corporate Video', 'Commercial Production', 'Documentary'],
+		'knowsLanguage' => ['fr', 'en', 'es'],
+	];
+
+	// Omit sameAs entirely rather than emit an empty array when no real
+	// social URL is configured — no placeholders in structured data.
+	if (!empty($social_urls)) {
+		$organization['sameAs'] = $social_urls;
+	}
 
 	$schema = [
 		'@context' => 'https://schema.org',
 		'@graph'   => [
-			[
-				'@type'       => ['Organization', 'LocalBusiness', 'ProfessionalService'],
-				'@id'         => $site_url . '#organization',
-				'name'        => $site_name,
-				'url'         => $site_url,
-				'logo'        => [
-					'@type' => 'ImageObject',
-					'url'   => $logo_url,
-				],
-				'description' => trepied_get_front_page_seo_description(),
-				'address'     => [
-					'@type'            => 'PostalAddress',
-					'addressLocality'  => 'Montreal',
-					'addressRegion'    => 'QC',
-					'addressCountry'   => 'CA',
-				],
-				'areaServed'  => ['Montreal', 'Quebec', 'Canada'],
-				'serviceType' => ['Video Production', 'Corporate Video', 'Commercial Production', 'Documentary'],
-				'knowsLanguage' => ['fr', 'en'],
-				'sameAs'      => [
-					'https://instagram.com',
-					'https://youtube.com',
-				],
-			],
+			$organization,
 			[
 				'@type'           => 'WebSite',
 				'@id'             => $site_url . '#website',
 				'url'             => $site_url,
 				'name'            => $site_name,
 				'publisher'       => ['@id' => $site_url . '#organization'],
-				'inLanguage'      => ['fr-CA', 'en-CA'],
+				'inLanguage'      => ['fr-CA', 'en-CA', 'es'],
 			],
 		],
 	];

@@ -24,28 +24,35 @@ if (!defined('ABSPATH')) {
 			</button>
 		</div>
 		<div class="flex items-center gap-4">
-			<!-- Hidden: no real Trépied Instagram handle yet, blocked on client input. Markup kept for when one exists. -->
-			<a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="hidden hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('Instagram', 'trepied'); ?>">
+			<?php $instagram_url = trepied_get_option('instagram_url'); ?>
+			<?php if ($instagram_url) : ?>
+			<a href="<?php echo esc_url($instagram_url); ?>" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('Instagram', 'trepied'); ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#1a1a1a]">
 					<rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
 					<path d="M16 11.37a4 4 0 1 1-7.914 1.174A4 4 0 0 1 16 11.37z"></path>
 					<line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
 				</svg>
 			</a>
-			<!-- Hidden: no real Trépied YouTube channel yet, blocked on client input. Markup kept for when one exists. -->
-			<a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="hidden hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('YouTube', 'trepied'); ?>">
+			<?php endif; ?>
+			<?php $youtube_url = trepied_get_option('youtube_url'); ?>
+			<?php if ($youtube_url) : ?>
+			<a href="<?php echo esc_url($youtube_url); ?>" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('YouTube', 'trepied'); ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#1a1a1a]">
 					<path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path>
 					<path d="m10 15 5-3-5-3z"></path>
 				</svg>
 			</a>
-			<a href="https://www.linkedin.com/in/israel-valencia-833aa341/" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('LinkedIn', 'trepied'); ?>">
+			<?php endif; ?>
+			<?php $linkedin_url = trepied_get_option('linkedin_url'); ?>
+			<?php if ($linkedin_url) : ?>
+			<a href="<?php echo esc_url($linkedin_url); ?>" target="_blank" rel="noopener noreferrer" class="hover:opacity-60 transition-opacity" aria-label="<?php echo esc_attr__('LinkedIn', 'trepied'); ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-[#1a1a1a]">
 					<path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
 					<rect x="2" y="9" width="4" height="12"></rect>
 					<circle cx="4" cy="4" r="2"></circle>
 				</svg>
 			</a>
+			<?php endif; ?>
 		</div>
 	</div>
 </footer>

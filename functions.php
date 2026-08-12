@@ -177,6 +177,36 @@ function trepied_favicons(): void {
 add_action('wp_head', 'trepied_favicons', 1);
 
 /**
+ * Front page SEO title, from the "FrontPage SEO" ACF group (per-language
+ * via ACFML). Never hardcoded — falls back to the site title only if the
+ * field is genuinely empty.
+ */
+function trepied_get_front_page_seo_title(): string {
+	if (!function_exists('get_field')) {
+		return get_bloginfo('name');
+	}
+
+	$front_page_id = trepied_get_front_page_id();
+	$title = $front_page_id ? get_field('seo_title', $front_page_id) : '';
+
+	return $title ? $title : get_bloginfo('name');
+}
+
+/**
+ * Front page SEO description, same source/field group as the title.
+ */
+function trepied_get_front_page_seo_description(): string {
+	if (!function_exists('get_field')) {
+		return '';
+	}
+
+	$front_page_id = trepied_get_front_page_id();
+	$description = $front_page_id ? get_field('seo_meta_description', $front_page_id) : '';
+
+	return $description ? $description : '';
+}
+
+/**
  * Add meta description for SEO
  * Only outputs if no SEO plugin (Yoast, RankMath, etc.) is active
  */
@@ -189,10 +219,7 @@ function trepied_add_meta_description(): void {
 	$description = '';
 
 	if (is_front_page() || is_home()) {
-		$description = get_bloginfo('description');
-		if (empty($description)) {
-			$description = __('Trépied - Creative studio specializing in web development, branding, and digital experiences.', 'trepied');
-		}
+		$description = trepied_get_front_page_seo_description();
 	} elseif (is_singular()) {
 		$post = get_queried_object();
 		if ($post && !empty($post->post_excerpt)) {
@@ -211,6 +238,24 @@ function trepied_add_meta_description(): void {
 	}
 }
 add_action('wp_head', 'trepied_add_meta_description', 1);
+
+/**
+ * Override the <title> tag on the front page.
+ * WP's title-tag support (add_theme_support('title-tag')) otherwise falls
+ * back to just the site title ("trepied") with no SEO plugin active.
+ */
+function trepied_front_page_document_title(string $title): string {
+	if (defined('WPSEO_VERSION') || defined('RANK_MATH_VERSION') || defined('AIOSEO_VERSION')) {
+		return $title;
+	}
+
+	if (!is_front_page()) {
+		return $title;
+	}
+
+	return trepied_get_front_page_seo_title();
+}
+add_filter('pre_get_document_title', 'trepied_front_page_document_title', 20);
 
 /**
  * Add defer attribute to non-critical scripts
@@ -371,6 +416,35 @@ function trepied_is_multilingual_active(): bool {
 }
 
 /**
+ * Correct the <html lang="..."> attribute for the Quebec/Canada audience.
+ *
+ * WPML's configured locales here are en_US/fr_FR/es_ES (a WPML Languages
+ * admin setting, not a theme concern) which language_attributes() turns
+ * into lang="en-US"/"fr-FR"/"es-ES". This only overrides the rendered
+ * attribute for SEO/accessibility — it does not touch WPML's own locale
+ * config (date formats, etc.), which is a separate, riskier change.
+ */
+function trepied_fix_language_attributes(string $output): string {
+	if (!function_exists('apply_filters')) {
+		return $output;
+	}
+
+	$current_lang = apply_filters('wpml_current_language', null);
+	$lang_map = [
+		'en' => 'en-CA',
+		'fr' => 'fr-CA',
+		'es' => 'es',
+	];
+
+	if (!$current_lang || !isset($lang_map[$current_lang])) {
+		return $output;
+	}
+
+	return preg_replace('/lang="[^"]*"/', 'lang="' . esc_attr($lang_map[$current_lang]) . '"', $output, 1);
+}
+add_filter('language_attributes', 'trepied_fix_language_attributes');
+
+/**
  * Add canonical URL tag
  */
 function trepied_add_canonical(): void {
@@ -403,9 +477,11 @@ function trepied_add_social_meta(): void {
 	}
 
 	$title       = wp_get_document_title();
-	$description = get_bloginfo('description');
+	$description = is_front_page() ? trepied_get_front_page_seo_description() : get_bloginfo('description');
 	$url         = is_front_page() ? home_url('/') : (is_singular() ? get_permalink() : home_url('/'));
-	$type        = is_singular() ? 'article' : 'website';
+	// A static front page is also is_singular() — check is_front_page() first,
+	// otherwise the homepage gets tagged as "article" instead of "website".
+	$type        = is_front_page() ? 'website' : (is_singular() ? 'article' : 'website');
 	$image       = '';
 	$site_name   = get_bloginfo('name');
 
@@ -475,7 +551,7 @@ function trepied_add_schema(): void {
 					'@type' => 'ImageObject',
 					'url'   => $logo_url,
 				],
-				'description' => get_bloginfo('description'),
+				'description' => trepied_get_front_page_seo_description(),
 				'address'     => [
 					'@type'            => 'PostalAddress',
 					'addressLocality'  => 'Montreal',

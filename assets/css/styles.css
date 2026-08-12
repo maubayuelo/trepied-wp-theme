@@ -164,6 +164,28 @@ button:focus {
     transition: none !important;
 }
 
+/* Skip-to-content link: visually hidden until focused, first focusable
+   element in the document (see header.php). Sits above the fixed nav
+   (z-50) so keyboard users landing on it can actually see it. */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    z-index: 100;
+    background: var(--trepied-color-ink);
+    color: var(--trepied-color-white);
+    padding: 0.75rem 1.25rem;
+    border-radius: 0 0 8px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
 /* Footer utility links/buttons (Privacy Policy, Manage Cookies): no
    :focus-visible state existed anywhere in the theme before this. */
 footer a:focus-visible,

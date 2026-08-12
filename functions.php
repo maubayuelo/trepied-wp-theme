@@ -113,7 +113,11 @@ function trepied_enqueue_assets(): void
 	wp_enqueue_script('trepied-tailwind');
 
 	// Lucide icons - load in footer, defer
-	wp_enqueue_script('trepied-lucide', 'https://unpkg.com/lucide@latest/dist/umd/lucide.min.js', [], null, true);
+	// Pinned to an exact version — @latest means an unpkg outage or a
+	// breaking Lucide release takes out every icon on the site (hamburger,
+	// modal close, slider arrows, go-to-top) with no warning and no
+	// theme deploy to roll back to. Bump this deliberately when upgrading.
+	wp_enqueue_script('trepied-lucide', 'https://unpkg.com/lucide@1.31.0/dist/umd/lucide.min.js', [], '1.31.0', true);
 
 	// Reusable accessible dialog module (focus trap, Esc, backdrop, scroll lock)
 	$modal_js_path = get_template_directory() . '/assets/js/modal.js';
@@ -447,26 +451,17 @@ add_filter('language_attributes', 'trepied_fix_language_attributes');
 /**
  * Add canonical URL tag
  */
-function trepied_add_canonical(): void {
-	if (defined('WPSEO_VERSION') || defined('RANK_MATH_VERSION') || defined('AIOSEO_VERSION')) {
-		return;
-	}
-
-	$canonical = '';
-
-	if (is_front_page()) {
-		$canonical = home_url('/');
-	} elseif (is_singular()) {
-		$canonical = get_permalink();
-	} elseif (is_category() || is_tag() || is_tax()) {
-		$canonical = get_term_link(get_queried_object());
-	}
-
-	if (!empty($canonical) && !is_wp_error($canonical)) {
-		echo '<link rel="canonical" href="' . esc_url($canonical) . '">' . "\n";
-	}
-}
-add_action('wp_head', 'trepied_add_canonical', 1);
+/**
+ * Removed trepied_add_canonical(): it duplicated WordPress core's own
+ * rel_canonical() (wp-includes/link-template.php, hooked on wp_head by
+ * default) — the served HTML had two <link rel="canonical"> tags, one
+ * from each. Core's version already covers front page / singular /
+ * archives and is transparently language-aware under WPML (WPML filters
+ * the underlying home_url()/get_permalink() calls core's function uses,
+ * it does not compete with a canonical tag of its own). No SEO-plugin
+ * detection is needed here; core's own function already no-ops when
+ * Yoast/RankMath/AIOSEO take over the canonical tag.
+ */
 
 /**
  * Add Open Graph and Twitter Card meta tags

@@ -14,7 +14,7 @@ $hero_video_mobile = $hero['video_mobile'] ?? '';
 $hero_image        = $hero['image'] ?? null;
 ?>
 
-<section class="pt-32 pb-12 md:pt-44 md:pb-16 px-8 md:px-16 lg:px-24">
+<section id="main-content" class="pt-32 pb-12 md:pt-44 md:pb-16 px-8 md:px-16 lg:px-24">
 	<div class="max-w-[1400px] mx-auto">
 		<div class="flex flex-col lg:flex-row gap-9 items-start">
 			<div class="flex-1 max-w-[920px] order-1">
@@ -58,6 +58,7 @@ $hero_image        = $hero['image'] ?? null;
 					'class' => 'absolute inset-0 w-full h-full object-cover',
 					'fetchpriority' => 'high',
 					'decoding' => 'async',
+					'alt' => $hero_subtitle ? $hero_subtitle : $hero_copy,
 				]); ?>
 			<?php endif; ?>
 		</div>
@@ -134,6 +135,7 @@ $services_items = $services['service'] ?? [];
 					<?php echo wp_get_attachment_image($service_image['id'], 'trepied-service', false, [
 						'class' => 'w-full h-[420px] md:h-[520px] object-cover rounded-2xl',
 						'loading' => 'lazy',
+						'alt' => $service_title,
 					]); ?>
 				</div>
 				<?php endif; ?>
@@ -144,6 +146,7 @@ $services_items = $services['service'] ?? [];
 					<?php echo wp_get_attachment_image($service_image['id'], 'trepied-service', false, [
 						'class' => 'w-full h-[420px] md:h-[520px] object-cover rounded-2xl',
 						'loading' => 'lazy',
+						'alt' => $service_title,
 					]); ?>
 				</div>
 				<?php endif; ?>
@@ -230,6 +233,7 @@ $projects_items = $projects['project'] ?? [];
 				<?php echo wp_get_attachment_image($project_image['id'], 'trepied-hero', false, [
 					'class' => 'w-full h-[360px] md:h-[520px] object-cover rounded-2xl mb-8',
 					'loading' => 'lazy',
+					'alt' => $project_client ? "{$project_title} — {$project_client}" : $project_title,
 				]); ?>
 				<?php endif; ?>
 				
@@ -314,6 +318,7 @@ $about_image_id = is_array($about_image) ? ($about_image['id'] ?? null) : $about
 			<?php echo wp_get_attachment_image($about_image_id, 'trepied-hero', false, [
 				'class' => 'w-full h-[360px] md:h-[480px] object-cover rounded-2xl',
 				'loading' => 'lazy',
+				'alt' => $about_title ? $about_title : sprintf(__('%s team', 'trepied'), get_bloginfo('name')),
 			]); ?>
 		</div>
 		<?php endif; ?>

@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 get_header();
 ?>
 
-<main class="legal">
+<main id="main-content" class="legal">
 	<?php while (have_posts()) : the_post(); ?>
 		<h1 class="legal__title"><?php the_title(); ?></h1>
 		<p class="legal__updated">

@@ -13,6 +13,8 @@ if (!defined('ABSPATH')) {
 <body <?php body_class('min-h-screen bg-cream font-sans antialiased text-[#1a1a1a]'); ?>>
 <?php wp_body_open(); ?>
 
+<a href="#main-content" class="skip-link"><?php echo esc_html__('Skip to content', 'trepied'); ?></a>
+
 <nav class="fixed top-0 left-0 right-0 z-50 bg-cream/90 backdrop-blur-md">
 	<div class="max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24 h-20 flex items-center justify-between">
 		<a href="<?php echo esc_url(home_url('/')); ?>" class="text-[15px] font-black tracking-[0.02em] uppercase">
@@ -23,6 +25,7 @@ if (!defined('ABSPATH')) {
 			<a href="<?php echo esc_url(home_url('/') . '#services'); ?>" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('Services', 'trepied'); ?></a>
 			<a href="<?php echo esc_url(home_url('/') . '#projects'); ?>" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('Work', 'trepied'); ?></a>
 			<a href="<?php echo esc_url(home_url('/') . '#about'); ?>" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('About', 'trepied'); ?></a>
+			<a href="<?php echo esc_url(home_url('/') . '#contact'); ?>" class="hover:opacity-60 transition-opacity"><?php echo esc_html__('Contact', 'trepied'); ?></a>
 			<div class="flex items-center gap-8">
 				<?php if (trepied_is_multilingual_active()) : ?>
 				<div class="flex items-center gap-3">
@@ -44,7 +47,7 @@ if (!defined('ABSPATH')) {
 				esc_html__('Schedule a Call', 'trepied'),
 				'!px-5 !py-2 !text-[13px] font-medium whitespace-nowrap'
 			); ?>
-			<button id="mobile-menu-toggle" class="p-2.5 bg-black text-white hover:bg-accent-red transition-all duration-300 rounded-full">
+			<button id="mobile-menu-toggle" class="p-2.5 bg-black text-white hover:bg-accent-red transition-all duration-300 rounded-full" aria-label="<?php echo esc_attr__('Toggle menu', 'trepied'); ?>">
 				<i data-lucide="menu" class="w-5 h-5"></i>
 			</button>
 		</div>

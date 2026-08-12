@@ -482,25 +482,36 @@ function trepied_add_social_meta(): void {
 	// A static front page is also is_singular() — check is_front_page() first,
 	// otherwise the homepage gets tagged as "article" instead of "website".
 	$type        = is_front_page() ? 'website' : (is_singular() ? 'article' : 'website');
-	$image       = '';
-	$site_name   = get_bloginfo('name');
+	$image        = '';
+	$image_width  = 0;
+	$image_height = 0;
+	$site_name    = get_bloginfo('name');
 
 	// Try to get a relevant image
 	if (is_singular() && has_post_thumbnail()) {
 		$thumb = wp_get_attachment_image_src(get_post_thumbnail_id(), 'large');
 		if ($thumb) {
-			$image = $thumb[0];
+			$image        = $thumb[0];
+			$image_width  = $thumb[1];
+			$image_height = $thumb[2];
 		}
 	}
 
-	// Fallback: ACF hero image
+	// Fallback: ACF hero image. Not a real 1200x630 share asset — it is the
+	// decorative brand symbol (596x792, portrait). Blocked on the client
+	// providing a proper share image (see CLAUDE.md); in the meantime the
+	// declared dimensions below are read from the actual file so they never
+	// lie about what will be shown, even though the image itself is a poor
+	// fit for a 1.91:1 social card.
 	if (empty($image) && function_exists('get_field')) {
 		$hero = get_field('hero', 'option');
 		if (empty($hero)) {
 			$hero = get_field('hero');
 		}
 		if (!empty($hero['image']['url'])) {
-			$image = $hero['image']['url'];
+			$image        = $hero['image']['url'];
+			$image_width  = (int) ($hero['image']['width'] ?? 0);
+			$image_height = (int) ($hero['image']['height'] ?? 0);
 		}
 	}
 
@@ -513,8 +524,10 @@ function trepied_add_social_meta(): void {
 
 	if (!empty($image)) {
 		echo '<meta property="og:image" content="' . esc_url($image) . '">' . "\n";
-		echo '<meta property="og:image:width" content="1200">' . "\n";
-		echo '<meta property="og:image:height" content="630">' . "\n";
+		if ($image_width && $image_height) {
+			echo '<meta property="og:image:width" content="' . esc_attr($image_width) . '">' . "\n";
+			echo '<meta property="og:image:height" content="' . esc_attr($image_height) . '">' . "\n";
+		}
 	}
 
 	echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
@@ -595,6 +608,15 @@ function trepied_preload_hero_image(): void {
 	}
 
 	$hero = get_field('hero');
+
+	// The <video> branch takes precedence in front-page.php's markup — if
+	// a hero video is set, the ACF hero image never actually renders on
+	// the page. Preloading it anyway wastes a high-priority download on
+	// an asset the browser will never paint.
+	if (!empty($hero['video'])) {
+		return;
+	}
+
 	if (empty($hero['image']['id'])) {
 		return;
 	}

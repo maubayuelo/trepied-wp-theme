@@ -133,6 +133,16 @@ function trepied_get_option(string $key): string
 
 	$value = get_field($key, 'option');
 
+	if ($value === null || $value === '') {
+		// Under WPML, ACFML can return null for an options-page field in a
+		// non-default language when no per-language copy was ever saved —
+		// even though these are organization-level values (LinkedIn URL,
+		// GA4 ID, legal contact info...) meant to be identical in every
+		// language. Fall back to the raw value ACF actually persists an
+		// options-page field under, bypassing WPML's language filtering.
+		$value = get_option('options_' . $key);
+	}
+
 	return is_string($value) ? trim($value) : '';
 }
 

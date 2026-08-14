@@ -4,6 +4,9 @@
  *
  * No ID configured in the "Trépied — Config" options page → that script
  * is never enqueued, with or without consent (see trepied_get_option()).
+ * Also gated by trepied_is_production() (inc/options.php) — an ID being
+ * present is not enough outside the production domain, since the DB
+ * (and its saved IDs) gets imported to local for development.
  *
  * @package Trepied
  */
@@ -47,6 +50,16 @@ function trepied_enqueue_ga4(string $ga4_id): void
  */
 function trepied_enqueue_consent_gating(): void
 {
+	// The production DB gets imported to local for dev, bringing real
+	// GA4/Pixel IDs with it — never trust "an ID is set" as the signal to
+	// fire. See trepied_is_production() (inc/options.php). Returning here
+	// suppresses everything downstream: no gtag.js request, no inline
+	// bootstrap, no dataLayer/Consent Mode call, and no ID reaching the
+	// front end via wp_localize_script.
+	if (!trepied_is_production()) {
+		return;
+	}
+
 	$ga4_id   = trepied_get_option('ga4_measurement_id');
 	$pixel_id = trepied_get_option('meta_pixel_id');
 

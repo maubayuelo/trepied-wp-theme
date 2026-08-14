@@ -159,3 +159,71 @@ function trepied_get_social_urls(): array
 
 	return array_values(array_filter($urls));
 }
+
+/**
+ * Is this request running on the production domain?
+ *
+ * The production DB gets imported to local for development, bringing the
+ * live GA4/Pixel IDs with it — so "an ID is set" can never be the signal
+ * that analytics should fire. This is the actual gate. Host is derived
+ * from home_url(), never $_SERVER['HTTP_HOST'] (attacker-controllable,
+ * and unset entirely under WP-CLI).
+ *
+ * TREPIED_DISABLE_ANALYTICS wins over TREPIED_FORCE_ANALYTICS if both are
+ * somehow defined true — disabling should never be silently overridden.
+ *
+ * @return bool
+ */
+function trepied_is_production(): bool
+{
+	if (defined('TREPIED_DISABLE_ANALYTICS') && TREPIED_DISABLE_ANALYTICS) {
+		return false;
+	}
+
+	if (defined('TREPIED_FORCE_ANALYTICS') && TREPIED_FORCE_ANALYTICS) {
+		return true;
+	}
+
+	$host = wp_parse_url(home_url(), PHP_URL_HOST);
+
+	if (!$host) {
+		return false;
+	}
+
+	$host = strtolower((string) $host);
+	$host = preg_replace('/^www\./', '', $host);
+
+	return $host === 'trepied.ca';
+}
+
+/**
+ * Surface the analytics guard's state on the "Trépied — Config" screen —
+ * emptying the GA4 field by hand after every DB import has already been
+ * missed once; this makes the (safe) suppressed state visible instead of
+ * silent. Informational only — fields stay editable, values stay saved.
+ */
+function trepied_analytics_guard_notice(): void
+{
+	if (trepied_is_production()) {
+		return;
+	}
+
+	$screen = get_current_screen();
+	if (!$screen || strpos($screen->id, 'trepied-config') === false) {
+		return;
+	}
+
+	$host = (string) wp_parse_url(home_url(), PHP_URL_HOST);
+
+	printf(
+		'<div class="notice notice-info"><p>%s</p></div>',
+		esc_html(
+			sprintf(
+				/* translators: %s: current site host */
+				__('Analytics are disabled on this environment (%s). IDs are saved but not emitted.', 'trepied'),
+				$host
+			)
+		)
+	);
+}
+add_action('admin_notices', 'trepied_analytics_guard_notice');

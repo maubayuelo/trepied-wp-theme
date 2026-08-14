@@ -181,33 +181,39 @@ function trepied_favicons(): void {
 add_action('wp_head', 'trepied_favicons', 1);
 
 /**
- * Front page SEO title, from the "FrontPage SEO" ACF group (per-language
- * via ACFML). Never hardcoded — falls back to the site title only if the
- * field is genuinely empty.
+ * Resolve the post ID the "SEO" ACF field group (post_type == page) should
+ * be read from for the current request. The front page needs the explicit
+ * WPML-aware lookup (trepied_get_front_page_id()) rather than
+ * get_queried_object_id(), since the latter has been unreliable across
+ * WPML front-end/back-end contexts elsewhere in this theme; every other
+ * page can rely on the already-resolved queried object.
  */
-function trepied_get_front_page_seo_title(): string {
-	if (!function_exists('get_field')) {
-		return get_bloginfo('name');
+function trepied_get_seo_page_id(): int {
+	if (is_front_page()) {
+		return trepied_get_front_page_id();
 	}
 
-	$front_page_id = trepied_get_front_page_id();
-	$title = $front_page_id ? get_field('seo_title', $front_page_id) : '';
-
-	return $title ? $title : get_bloginfo('name');
+	return is_page() ? get_queried_object_id() : 0;
 }
 
 /**
- * Front page SEO description, same source/field group as the title.
+ * Read a field from the "SEO" ACF group for the current page. Returns ''
+ * for anything unavailable (ACF inactive, no page ID, empty field) — never
+ * null/false, so callers can rely on plain string checks.
  */
-function trepied_get_front_page_seo_description(): string {
+function trepied_get_seo_field(string $field_name): string {
 	if (!function_exists('get_field')) {
 		return '';
 	}
 
-	$front_page_id = trepied_get_front_page_id();
-	$description = $front_page_id ? get_field('seo_meta_description', $front_page_id) : '';
+	$page_id = trepied_get_seo_page_id();
+	if (!$page_id) {
+		return '';
+	}
 
-	return $description ? $description : '';
+	$value = get_field($field_name, $page_id);
+
+	return is_string($value) ? $value : '';
 }
 
 /**
@@ -220,22 +226,24 @@ function trepied_add_meta_description(): void {
 		return;
 	}
 
-	$description = '';
+	// ACF 'seo_description' only — deliberately no post-content fallback,
+	// an empty tag is preferred over an auto-generated one (see CLAUDE.md).
+	$description = is_page() ? trepied_get_seo_field('seo_description') : '';
 
-	if (is_front_page() || is_home()) {
-		$description = trepied_get_front_page_seo_description();
-	} elseif (is_singular()) {
-		$post = get_queried_object();
-		if ($post && !empty($post->post_excerpt)) {
-			$description = $post->post_excerpt;
-		} elseif ($post && !empty($post->post_content)) {
-			$description = wp_trim_words(strip_shortcodes($post->post_content), 25, '...');
+	if ($description === '' && !is_page()) {
+		if (is_singular()) {
+			$post = get_queried_object();
+			if ($post && !empty($post->post_excerpt)) {
+				$description = $post->post_excerpt;
+			} elseif ($post && !empty($post->post_content)) {
+				$description = wp_trim_words(strip_shortcodes($post->post_content), 25, '...');
+			}
+		} elseif (is_category() || is_tag() || is_tax()) {
+			$description = term_description();
 		}
-	} elseif (is_category() || is_tag() || is_tax()) {
-		$description = term_description();
 	}
 
-	if (!empty($description)) {
+	if ($description !== '') {
 		$description = wp_strip_all_tags($description);
 		$description = esc_attr(substr($description, 0, 160));
 		echo '<meta name="description" content="' . $description . '">' . "\n";
@@ -244,22 +252,25 @@ function trepied_add_meta_description(): void {
 add_action('wp_head', 'trepied_add_meta_description', 1);
 
 /**
- * Override the <title> tag on the front page.
- * WP's title-tag support (add_theme_support('title-tag')) otherwise falls
- * back to just the site title ("trepied") with no SEO plugin active.
+ * Override the <title> tag on any page (the "SEO" field group's location
+ * rule is post_type == page). Falls through to WP's own title-tag output
+ * (post title + site name, from add_theme_support('title-tag')) when
+ * seo_title is empty for that page/language.
  */
-function trepied_front_page_document_title(string $title): string {
+function trepied_document_title_override(string $title): string {
 	if (defined('WPSEO_VERSION') || defined('RANK_MATH_VERSION') || defined('AIOSEO_VERSION')) {
 		return $title;
 	}
 
-	if (!is_front_page()) {
+	if (!is_page()) {
 		return $title;
 	}
 
-	return trepied_get_front_page_seo_title();
+	$seo_title = trepied_get_seo_field('seo_title');
+
+	return $seo_title !== '' ? esc_html($seo_title) : $title;
 }
-add_filter('pre_get_document_title', 'trepied_front_page_document_title', 20);
+add_filter('pre_get_document_title', 'trepied_document_title_override', 20);
 
 /**
  * Add defer attribute to non-critical scripts
@@ -471,19 +482,39 @@ function trepied_add_social_meta(): void {
 		return;
 	}
 
-	$title       = wp_get_document_title();
-	$description = is_front_page() ? trepied_get_front_page_seo_description() : get_bloginfo('description');
-	$url         = is_front_page() ? home_url('/') : (is_singular() ? get_permalink() : home_url('/'));
+	$title = wp_get_document_title();
+	$url   = is_front_page() ? home_url('/') : (is_singular() ? get_permalink() : home_url('/'));
 	// A static front page is also is_singular() — check is_front_page() first,
 	// otherwise the homepage gets tagged as "article" instead of "website".
-	$type        = is_front_page() ? 'website' : (is_singular() ? 'article' : 'website');
+	$type      = is_front_page() ? 'website' : (is_singular() ? 'article' : 'website');
+	$site_name = get_bloginfo('name');
+
+	// Description: seo_og_description -> seo_description -> omit entirely.
+	// No auto-generated fallback — an absent tag beats a wrong one.
+	$description = trepied_get_seo_field('seo_og_description');
+	if ($description === '') {
+		$description = trepied_get_seo_field('seo_description');
+	}
+
 	$image        = '';
 	$image_width  = 0;
 	$image_height = 0;
-	$site_name    = get_bloginfo('name');
 
-	// Try to get a relevant image
-	if (is_singular() && has_post_thumbnail()) {
+	// 1. seo_og_image (ACF image field, return_format 'array') — dimensions
+	// read from the attachment itself via wp_get_attachment_image_src(),
+	// never hardcoded.
+	$seo_og_image = is_page() ? get_field('seo_og_image', trepied_get_seo_page_id()) : null;
+	if (!empty($seo_og_image['ID'])) {
+		$src = wp_get_attachment_image_src((int) $seo_og_image['ID'], 'full');
+		if ($src) {
+			$image        = $src[0];
+			$image_width  = $src[1];
+			$image_height = $src[2];
+		}
+	}
+
+	// 2. Post thumbnail
+	if (empty($image) && is_singular() && has_post_thumbnail()) {
 		$thumb = wp_get_attachment_image_src(get_post_thumbnail_id(), 'large');
 		if ($thumb) {
 			$image        = $thumb[0];
@@ -492,12 +523,11 @@ function trepied_add_social_meta(): void {
 		}
 	}
 
-	// Fallback: ACF hero image. Not a real 1200x630 share asset — it is the
-	// decorative brand symbol (596x792, portrait). Blocked on the client
-	// providing a proper share image (see CLAUDE.md); in the meantime the
-	// declared dimensions below are read from the actual file so they never
-	// lie about what will be shown, even though the image itself is a poor
-	// fit for a 1.91:1 social card.
+	// 3. Fallback: ACF hero image. Not a real 1200x630 share asset — it is
+	// the decorative brand symbol (596x792, portrait). The declared
+	// dimensions below are read from the actual file so they never lie
+	// about what will be shown, even though it's a poor fit for a 1.91:1
+	// social card — use seo_og_image on that page to override it.
 	if (empty($image) && function_exists('get_field')) {
 		$hero = get_field('hero', 'option');
 		if (empty($hero)) {
@@ -512,7 +542,9 @@ function trepied_add_social_meta(): void {
 
 	echo '<meta property="og:type" content="' . esc_attr($type) . '">' . "\n";
 	echo '<meta property="og:title" content="' . esc_attr($title) . '">' . "\n";
-	echo '<meta property="og:description" content="' . esc_attr(substr(wp_strip_all_tags($description), 0, 160)) . '">' . "\n";
+	if ($description !== '') {
+		echo '<meta property="og:description" content="' . esc_attr(substr(wp_strip_all_tags($description), 0, 160)) . '">' . "\n";
+	}
 	echo '<meta property="og:url" content="' . esc_url($url) . '">' . "\n";
 	echo '<meta property="og:site_name" content="' . esc_attr($site_name) . '">' . "\n";
 	echo '<meta property="og:locale" content="' . esc_attr(get_locale()) . '">' . "\n";
@@ -527,7 +559,9 @@ function trepied_add_social_meta(): void {
 
 	echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
 	echo '<meta name="twitter:title" content="' . esc_attr($title) . '">' . "\n";
-	echo '<meta name="twitter:description" content="' . esc_attr(substr(wp_strip_all_tags($description), 0, 160)) . '">' . "\n";
+	if ($description !== '') {
+		echo '<meta name="twitter:description" content="' . esc_attr(substr(wp_strip_all_tags($description), 0, 160)) . '">' . "\n";
+	}
 
 	if (!empty($image)) {
 		echo '<meta name="twitter:image" content="' . esc_url($image) . '">' . "\n";
@@ -557,7 +591,7 @@ function trepied_add_schema(): void {
 			'@type' => 'ImageObject',
 			'url'   => $logo_url,
 		],
-		'description' => trepied_get_front_page_seo_description(),
+		'description' => trepied_get_seo_field('seo_description'),
 		'address'     => [
 			'@type'            => 'PostalAddress',
 			'addressLocality'  => 'Montreal',

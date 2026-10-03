@@ -102,16 +102,6 @@ function trepied_enqueue_assets(): void
 		);
 	}
 
-	// Tailwind CDN - load in footer. Not deferred: the inline config below
-	// must run immediately after this script executes and defines `tailwind`.
-	wp_register_script('trepied-tailwind', 'https://cdn.tailwindcss.com', [], null, true);
-	wp_add_inline_script(
-		'trepied-tailwind',
-		"tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif'],condensed:['Barlow Condensed','sans-serif']},colors:{cream:'#f5f3ed','accent-red':'#ff0000'}}}};",
-		'after'
-	);
-	wp_enqueue_script('trepied-tailwind');
-
 	// Lucide icons - load in footer, defer
 	// Pinned to an exact version — @latest means an unpkg outage or a
 	// breaking Lucide release takes out every icon on the site (hamburger,
@@ -146,6 +136,23 @@ function trepied_enqueue_assets(): void
 add_action('wp_enqueue_scripts', 'trepied_enqueue_assets');
 
 /**
+ * Precompiled Tailwind (npm run build:css). Priority 100 keeps it the last
+ * theme stylesheet in <head> — the cascade position the old CDN's injected
+ * <style> had, after styles.css, tokens.css, consent.css and legal.css.
+ */
+function trepied_enqueue_tailwind(): void
+{
+	$tailwind_css_path = get_template_directory() . '/assets/css/tailwind.css';
+	wp_enqueue_style(
+		'trepied-tailwind',
+		get_template_directory_uri() . '/assets/css/tailwind.css',
+		[],
+		file_exists($tailwind_css_path) ? (string) filemtime($tailwind_css_path) : wp_get_theme()->get('Version')
+	);
+}
+add_action('wp_enqueue_scripts', 'trepied_enqueue_tailwind', 100);
+
+/**
  * Add preconnect hints for external resources
  * Improves load time by establishing early connections
  */
@@ -156,7 +163,6 @@ function trepied_add_resource_hints(): void {
 
 	// Preconnect to CDNs used by the theme
 	echo '<link rel="preconnect" href="https://unpkg.com" crossorigin>' . "\n";
-	echo '<link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>' . "\n";
 
 	// DNS prefetch for Calendly (loaded on interaction)
 	echo '<link rel="dns-prefetch" href="https://assets.calendly.com">' . "\n";

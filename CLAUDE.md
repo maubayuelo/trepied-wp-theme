@@ -16,7 +16,7 @@ Sections in order: Hero → Services → Projects → About → Testimonials →
 
 - **WordPress** (local via LocalWP)
 - **ACF Pro** — all content is managed via ACF field groups (stored in the DB, not in code)
-- **Tailwind CSS** — loaded via CDN Play script, no build step
+- **Tailwind CSS 3.4.17** — precompiled to a static `assets/css/tailwind.css` (see Tailwind build below)
 - **Lucide Icons** — loaded via CDN (`unpkg.com/lucide`)
 - **Calendly** — popup widget, loaded on-demand (not on page load) for performance
 - **WPML-ready** — `wpml-config.xml` present, `trepied_get_front_page_id()` handles translation
@@ -28,11 +28,15 @@ Sections in order: Hero → Services → Projects → About → Testimonials →
 ```
 front-page.php        — the entire page template
 functions.php         — theme setup, enqueue, image sizes, SEO meta, hero image preload
+tailwind.config.js    — Tailwind content globs + theme extensions (fonts, cream, accent-red)
+package.json          — build:css / watch:css scripts (tailwindcss devDependency)
 inc/
   acf.php             — ACF helper layer (trepied_get_field, trepied_get_group)
   acf-fields.php      — disabled local field registration (reference only — DB fields are live)
   calendly.php        — Calendly URL builder + on-demand loader + button helper
 assets/
+  css/tailwind.src.css — Tailwind input (@tailwind base/components/utilities)
+  css/tailwind.css     — compiled, minified output — committed, never edit by hand
   images/symbol.png   — brand symbol used in hero and mobile sections
 style.css             — theme header only (no actual styles here)
 ```
@@ -140,8 +144,20 @@ Returns the Calendly URL with UTM params forwarded from the current page URL. Ba
 - Hero image preloaded via `<link rel="preload">` in `wp_head` (priority 2)
 - Hero video replaces YouTube iframe — no third-party iframe on page load
 - `<source media>` on `<video>` serves smaller file to mobile
-- Lucide icons and Tailwind loaded via CDN (no build step)
+- Tailwind is a precompiled static stylesheet in `<head>` (no FOUC — the old CDN Play script generated CSS in JS after first paint)
+- Lucide icons loaded via CDN
 - `dns-prefetch` added for `assets.calendly.com`
+
+---
+
+## Tailwind build
+
+- `npm install` once, then **`npm run build:css` after any Tailwind class change** and commit the regenerated `assets/css/tailwind.css`. `npm run watch:css` rebuilds while developing.
+- Only files matched by `content` in `tailwind.config.js` are scanned: `./*.php`, `./inc/**/*.php`, `./inc/**/*.js`, `./assets/js/**/*.js`. A class anywhere else gets no CSS.
+- Classes typed into DB content (ACF WYSIWYG, post content) are **not scanned** — they only work if the same class already appears in a scanned file.
+- Class names must be complete literal strings. `'text-' . $color` or `` `bg-${x}` `` will not be generated; write each full class name out (a ternary between two full names is fine).
+- Enqueued by `trepied_enqueue_tailwind()` on `wp_enqueue_scripts` priority **100** so it stays the last theme stylesheet (after styles.css, tokens.css, consent.css, legal.css) — the cascade position the CDN's injected `<style>` had. Don't lower the priority.
+- Preflight (`@tailwind base`) is on, as it was with the CDN.
 
 ---
 
@@ -158,7 +174,8 @@ Returns the Calendly URL with UTM params forwarded from the current page URL. Ba
 
 - No blog, no custom post types, no archive templates
 - Only one inner page template: `page-legal.php` (privacy policy pages)
-- No build step (no npm, no webpack, no compiled CSS)
+- No JS bundler (no webpack/Vite). The only build step is `npm run build:css` for Tailwind
+- No Tailwind CDN script — never re-add `cdn.tailwindcss.com`
 - No local ACF field registration (disabled — all in DB)
 
 ---
@@ -215,7 +232,7 @@ assets/css/legal.css       — page-legal.php styles only
 
 No `:root` variables existed anywhere in the theme before this work —
 colors/fonts were hardcoded Tailwind literals (`bg-cream`, `#1a1a1a`,
-etc. in `functions.php`'s inline Tailwind config and scattered across
+etc. in the Tailwind config (now `tailwind.config.js`) and scattered across
 templates). `tokens.css` extracts those same values into custom
 properties (`--trepied-color-*`, `--trepied-font-*`) so the consent
 module and legal pages have one source of truth instead of repeating

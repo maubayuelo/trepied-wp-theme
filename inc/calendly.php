@@ -26,14 +26,37 @@ if (!defined('TREPIED_CALENDLY_URL')) {
  */
 
 /**
+ * Calendly base URL from the "Trépied — Config" options page. Only an
+ * https://calendly.com/<path> link is accepted; anything else (empty,
+ * typo, other host) falls back to TREPIED_CALENDLY_URL.
+ *
+ * @return string
+ */
+function trepied_get_calendly_base_url(): string {
+	$url = trepied_get_option('calendly_url');
+	$parsed = $url !== '' ? wp_parse_url($url) : false;
+
+	if (
+		is_array($parsed)
+		&& ($parsed['scheme'] ?? '') === 'https'
+		&& strtolower($parsed['host'] ?? '') === 'calendly.com'
+		&& !empty($parsed['path'])
+	) {
+		return $url;
+	}
+
+	return TREPIED_CALENDLY_URL;
+}
+
+/**
  * Build Calendly URL with UTM parameters from current page
  *
- * @param string $base_url Optional custom Calendly URL, defaults to TREPIED_CALENDLY_URL
+ * @param string $base_url Optional custom Calendly URL, defaults to trepied_get_calendly_base_url()
  * @return string Calendly URL with UTM parameters appended
  */
 function trepied_get_calendly_url(string $base_url = ''): string {
 	if (empty($base_url)) {
-		$base_url = TREPIED_CALENDLY_URL;
+		$base_url = trepied_get_calendly_base_url();
 	}
 
 	// Collect UTM params from current URL

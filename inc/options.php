@@ -81,6 +81,13 @@ function trepied_register_options_fields(): void
 				'default_value' => 'Trépied',
 			],
 			[
+				'key'          => 'field_trepied_calendly_url',
+				'label'        => 'Calendly URL',
+				'name'         => 'calendly_url',
+				'type'         => 'url',
+				'instructions' => 'Booking link used by every Calendly button. Must be an https://calendly.com/... link. Leave empty to use the theme default.',
+			],
+			[
 				'key'          => 'field_trepied_linkedin_url',
 				'label'        => 'LinkedIn URL',
 				'name'         => 'linkedin_url',

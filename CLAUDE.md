@@ -125,7 +125,10 @@ Safe single-field reader for the front page. Handles missing ACF, missing front 
 Outputs the Calendly popup trigger button. Calendly assets load on-demand via `requestIdleCallback` — do not enqueue them on page load.
 
 ### `trepied_get_calendly_url(): string`
-Returns the Calendly URL with UTM params forwarded from the current page URL. Base URL is `TREPIED_CALENDLY_URL` constant (can be set in `wp-config.php`), defaults to `https://calendly.com/maubayuelo/30min`.
+Returns the Calendly URL with UTM params forwarded from the current page URL. Base URL comes from `trepied_get_calendly_base_url()`.
+
+### `trepied_get_calendly_base_url(): string`
+Reads the **Calendly URL** field (`calendly_url`, WP Admin → Trépied — Config) via `trepied_get_option()`. Returns it only if it is `https://calendly.com/<non-empty path>` (host compared lowercase); otherwise, including when empty, returns the `TREPIED_CALENDLY_URL` constant (can be set in `wp-config.php`, defaults to `https://calendly.com/maubayuelo/30min`).
 
 ---
 
@@ -164,6 +167,7 @@ Returns the Calendly URL with UTM params forwarded from the current page URL. Ba
 ## Calendly
 
 - Popup widget only (no inline embed)
+- Booking link is editable in WP Admin → Trépied — Config → **Calendly URL** (`field_trepied_calendly_url`). Non-calendly.com or non-https values are ignored and the theme default is used
 - Trigger class: `calendly-popup-trigger`
 - URL passed via `data-calendly-url` attribute on the button
 - UTM params are forwarded automatically from the page URL
@@ -192,7 +196,8 @@ this theme before it (confirmed by grep before starting).
 ```
 inc/options.php          — ACF options page "Trépied — Config": GA4 ID,
                             Meta Pixel ID, privacy contact email, legal
-                            entity name. trepied_get_option($key) is the
+                            entity name, Calendly URL, social URLs.
+                            trepied_get_option($key) is the
                             only safe reader. Empty ID → script never
                             loads, with or without consent.
 inc/consent/

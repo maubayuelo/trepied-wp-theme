@@ -340,6 +340,15 @@ function initQuoteForm() {
                         form_name: 'quote_request',
                     });
                 }
+
+                // GA4 Key Event: conversion. gtag() directly, matching
+                // inc/consent/analytics.php. No form data (budget, timeline,
+                // etc.) — Loi 25 applies to this site.
+                if (typeof gtag === 'function') {
+                    gtag('event', 'generate_lead', {
+                        cta_location: 'quote_form'
+                    });
+                }
             } else {
                 const errorMessage = result.data?.message || window.trepiedForms.i18n.error;
                 showFormMessage(errorMessage, 'error');

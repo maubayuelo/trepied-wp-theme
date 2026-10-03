@@ -52,12 +52,28 @@
 		}
 	}
 
+	// GA4 Key Event: conversion signal fired when a user opens the Calendly
+	// popup. Uses gtag() directly (never dataLayer.push) to match the
+	// pattern in inc/consent/analytics.php. Silently skips when gtag isn't
+	// defined — e.g. no GA4 ID configured, non-production, or consent not
+	// yet granting analytics (Consent Mode still queues it either way).
+	function trackBookClick(trigger) {
+		if (typeof gtag !== 'function') return;
+
+		var section = trigger.closest('section');
+		var ctaLocation = (section && section.id) || (trigger.closest('nav') ? 'nav' : 'unknown');
+
+		gtag('event', 'book_click', { cta_location: ctaLocation });
+	}
+
 	document.addEventListener('click', function (event) {
 		var trigger = event.target.closest('.calendly-popup-trigger');
 		if (!trigger) return;
 
 		event.preventDefault();
 		var url = trigger.dataset.calendlyUrl || defaultUrl;
+
+		trackBookClick(trigger);
 
 		loadCalendly(function () {
 			openCalendly(url);
